@@ -1,0 +1,281 @@
+/* ──────────────────────────────────────────────────────────────────
+   Caastor v2 — admin CMS chrome (DS-token based)
+   ────────────────────────────────────────────────────────────────── */
+.admin {
+  min-height: 100vh;
+  background: var(--bg-app);
+  color: var(--text-primary);
+}
+.admin-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 22px;
+  background: color-mix(in srgb, var(--bg-canvas) 90%, transparent);
+  -webkit-backdrop-filter: saturate(140%) blur(10px);
+  backdrop-filter: saturate(140%) blur(10px);
+  border-bottom: 1px solid var(--border-default);
+}
+.admin-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.admin-brand .t-mono {
+  color: var(--text-tertiary);
+  font-size: 11px;
+}
+.admin-body {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  align-items: start;
+  max-width: 1180px;
+  margin: 0 auto;
+}
+@media (max-width: 820px) {
+  .admin-body {
+    grid-template-columns: 1fr;
+  }
+}
+.admin-nav {
+  position: sticky;
+  top: 60px;
+  padding: 22px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.admin-nav button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 0;
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+}
+.admin-nav button:hover {
+  background: var(--bg-muted);
+  color: var(--text-primary);
+}
+.admin-nav button.on {
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+  font-weight: 600;
+}
+.admin-main {
+  padding: 22px 26px 140px;
+  min-width: 0;
+}
+.admin-h {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 4px;
+}
+.admin-sub {
+  color: var(--text-tertiary);
+  font-size: 14px;
+  margin-bottom: 22px;
+}
+
+/* ---- Fields ---- */
+.af {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+.af > label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+.af input,
+.af textarea,
+.af select {
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: 9px;
+  border: 1px solid var(--border-default);
+  background: var(--bg-canvas);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
+  transition: border-color var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out);
+}
+.af textarea {
+  min-height: 84px;
+  resize: vertical;
+  line-height: 21px;
+}
+.af input:focus,
+.af textarea:focus,
+.af select:focus {
+  border-color: var(--border-focus);
+  box-shadow: var(--shadow-focus);
+}
+
+/* ---- Tree / group cards ---- */
+.tree-group {
+  border: 1px solid var(--border-default);
+  border-radius: 12px;
+  background: var(--bg-canvas);
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+.tree-group > summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 12px 16px;
+  font-weight: 600;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  user-select: none;
+}
+.tree-group > summary::-webkit-details-marker {
+  display: none;
+}
+.tree-group[open] > summary {
+  border-bottom: 1px solid var(--border-default);
+}
+.tree-inner {
+  padding: 14px 16px;
+}
+.tree-item {
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+  background: var(--bg-sunken);
+}
+.tree-row-tools {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+/* ---- Save bar ---- */
+.admin-savebar {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 12px 10px 20px;
+  border-radius: 14px;
+  background: var(--bg-inverse);
+  color: var(--text-inverse);
+  box-shadow: var(--shadow-xl);
+}
+.admin-savebar span {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+}
+[data-theme="dark"] .admin-savebar span {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+/* ---- Login ---- */
+.admin-center {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.admin-login {
+  width: 100%;
+  max-width: 420px;
+  background: var(--bg-canvas);
+  border: 1px solid var(--border-default);
+  border-radius: 20px;
+  box-shadow: var(--shadow-lg);
+  padding: 32px;
+}
+
+/* ---- Logo / blog list rows ---- */
+.logo-row,
+.post-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--border-default);
+  border-radius: 12px;
+  background: var(--bg-canvas);
+  margin-bottom: 10px;
+}
+.logo-thumb {
+  width: 64px;
+  height: 40px;
+  border-radius: 8px;
+  border: 1px solid var(--border-default);
+  object-fit: contain;
+  background: var(--bg-muted);
+  flex-shrink: 0;
+}
+.blocklist-item {
+  border: 1px solid var(--border-default);
+  border-radius: 12px;
+  background: var(--bg-canvas);
+  padding: 14px 16px;
+  margin-bottom: 10px;
+}
+.blocklist-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.block-type-tag {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--brand-strong);
+}
+.add-block-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 8px;
+}
+.add-block-grid button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px dashed var(--border-strong);
+  background: var(--bg-canvas);
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.add-block-grid button:hover {
+  border-style: solid;
+  color: var(--text-primary);
+  background: var(--bg-muted);
+}
