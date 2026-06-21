@@ -177,7 +177,6 @@ a { color: inherit; text-decoration: none; }
 /* ---- Cards / grids ---- */
 .grid { display: grid; gap: 20px; }
 .grid-3 { grid-template-columns: repeat(3, 1fr); }
-.grid-4 { grid-template-columns: repeat(4, 1fr); }
 .grid-2 { grid-template-columns: repeat(2, 1fr); }
 
 .feature-card { display: flex; flex-direction: column; gap: 14px; height: 100%; }
@@ -268,7 +267,7 @@ a { color: inherit; text-decoration: none; }
   .nav-links { display: none; }
   .header-controls .desktop-only { display: none; }
   .menu-btn { display: inline-flex; }
-  .grid-3, .grid-4, .grid-2, .plan-grid { grid-template-columns: 1fr; }
+  .grid-3, .grid-2, .plan-grid { grid-template-columns: 1fr; }
   .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
 
   /* Full-height overlay that fades + slides in, links staggering up. */

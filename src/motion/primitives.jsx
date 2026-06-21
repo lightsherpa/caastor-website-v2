@@ -93,41 +93,6 @@ export function Reveal({ children, delay = 0, style, as = "div", y = 22, classNa
   );
 }
 
-/* ── Tilt — subtle pointer-driven 3D parallax for hero surfaces ── */
-export function Tilt({ children, max = 7, style }) {
-  const reduce = useReducedMotion();
-  const ref = useRef(null);
-  const px = useMotionValue(0.5);
-  const py = useMotionValue(0.5);
-  const sx = useSpring(px, { stiffness: 150, damping: 18 });
-  const sy = useSpring(py, { stiffness: 150, damping: 18 });
-  const rotateY = useTransform(sx, [0, 1], [-max, max]);
-  const rotateX = useTransform(sy, [0, 1], [max, -max]);
-
-  if (reduce) return <div style={style}>{children}</div>;
-
-  const onMove = (e) => {
-    const r = ref.current?.getBoundingClientRect();
-    if (!r) return;
-    px.set((e.clientX - r.left) / r.width);
-    py.set((e.clientY - r.top) / r.height);
-  };
-  const onLeave = () => {
-    px.set(0.5);
-    py.set(0.5);
-  };
-  return (
-    <motion.div
-      ref={ref}
-      onMouseMove={onMove}
-      onMouseLeave={onLeave}
-      style={{ rotateX, rotateY, transformPerspective: 1000, transformStyle: "preserve-3d", willChange: "transform", ...style }}
-    >
-      {children}
-    </motion.div>
-  );
-}
-
 /* ── PageTransition — coordinated fade + rise + de-blur on route ── */
 export function PageTransition({ routeKey, children }) {
   const reduce = useReducedMotion();
@@ -141,35 +106,6 @@ export function PageTransition({ routeKey, children }) {
     >
       {children}
     </motion.div>
-  );
-}
-
-/* ── CyclingWord — Rever-style rotating word ─────────────────── */
-export function CyclingWord({ words, interval = 1900, className }) {
-  const reduce = useReducedMotion();
-  const [i, setI] = useState(0);
-  useEffect(() => {
-    if (reduce || words.length < 2) return;
-    const id = setInterval(() => setI((x) => (x + 1) % words.length), interval);
-    return () => clearInterval(id);
-  }, [words, interval, reduce]);
-  if (reduce) return <span className={className}>{words[0]}</span>;
-  return (
-    <span style={{ position: "relative", display: "inline-grid", verticalAlign: "bottom" }}>
-      <AnimatePresence mode="popLayout" initial={false}>
-        <motion.span
-          key={i}
-          className={className}
-          initial={{ y: "0.6em", opacity: 0, filter: "blur(6px)" }}
-          animate={{ y: 0, opacity: 1, filter: "blur(0px)" }}
-          exit={{ y: "-0.6em", opacity: 0, filter: "blur(6px)", position: "absolute" }}
-          transition={{ duration: 0.42, ease: EASE }}
-          style={{ gridArea: "1 / 1", whiteSpace: "nowrap" }}
-        >
-          {words[i]}
-        </motion.span>
-      </AnimatePresence>
-    </span>
   );
 }
 

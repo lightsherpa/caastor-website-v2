@@ -3,20 +3,13 @@
    Ported 1:1 from the v2 design-system bundle. Icon set is the
    Apple-feel outline collection (currentColor, 24×24, ~1.6px stroke).
    ────────────────────────────────────────────────────────────────── */
-import { useState, useRef, useEffect, useLayoutEffect } from "react";
+import { useState, useRef } from "react";
 import { motion, useMotionValue, useSpring, useReducedMotion } from "motion/react";
 
 /* ── ICONS — inline SVG paths/fragments ─────────────────────── */
 export const ICONS = {
   search: <path d="M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16Zm10 2-5.2-5.2" />,
   plus: <path d="M12 5v14M5 12h14" />,
-  bell: <path d="M6 8a6 6 0 1 1 12 0c0 7 3 8 3 8H3s3-1 3-8Zm4 13a2 2 0 0 0 4 0" />,
-  settings: (
-    <>
-      <circle cx="12" cy="12" r="3" />
-      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82c.27.6.86.99 1.51 1H21a2 2 0 1 1 0 4h-.09c-.65.01-1.24.4-1.51 1Z" />
-    </>
-  ),
   check: <path d="m5 12 5 5L20 7" />,
   arrowRight: (
     <>
@@ -27,11 +20,9 @@ export const ICONS = {
   arrowUp: <path d="M12 19V5m-7 7 7-7 7 7" />,
   arrowDown: <path d="M12 5v14m-7-7 7 7 7-7" />,
   chevronRight: <path d="m9 6 6 6-6 6" />,
-  chevronDown: <path d="m6 9 6 6 6-6" />,
   chevronLeft: <path d="m15 6-6 6 6 6" />,
   dot: <circle cx="12" cy="12" r="4" />,
   sparkles: <path d="M12 3v4m0 10v4M3 12h4m10 0h4M5.6 5.6l2.8 2.8m7.2 7.2 2.8 2.8M5.6 18.4l2.8-2.8m7.2-7.2 2.8-2.8" />,
-  filter: <path d="M3 5h18M6 12h12M10 19h4" />,
   grid: (
     <>
       <rect x="3" y="3" width="7" height="7" rx="1.5" />
@@ -54,7 +45,6 @@ export const ICONS = {
       <path d="M5.5 5h13l3.5 7v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-6Z" />
     </>
   ),
-  folder: <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z" />,
   users: (
     <>
       <circle cx="9" cy="8" r="4" />
@@ -64,12 +54,6 @@ export const ICONS = {
     </>
   ),
   activity: <path d="M3 12h4l3-9 4 18 3-9h4" />,
-  clock: (
-    <>
-      <circle cx="12" cy="12" r="9" />
-      <path d="M12 7v5l3 3" />
-    </>
-  ),
   flag: <path d="M4 21V4m0 0 12 1-2 4 2 4H4" />,
   more: (
     <>
@@ -101,16 +85,7 @@ export const ICONS = {
     </>
   ),
   upload: <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4m4-7 5-5 5 5m-5-5v13" />,
-  download: <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4m4-5 5 5 5-5m-5 5V3" />,
   command: <path d="M6 9a3 3 0 1 1 3-3v12a3 3 0 1 1-3-3h12a3 3 0 1 1-3 3V6a3 3 0 1 1 3 3Z" />,
-  beaver: (
-    <>
-      <rect x="3" y="3" width="18" height="18" rx="4" />
-      <circle cx="9" cy="10" r="1.4" />
-      <circle cx="15" cy="10" r="1.4" />
-      <path d="M9 15h6M10 17l2 2 2-2" />
-    </>
-  ),
 };
 
 export function Icon({ name, size = 18, stroke = 1.6, color = "currentColor", style }) {
@@ -216,49 +191,6 @@ export function Button({ variant = "primary", size = "md", icon, iconEnd, childr
       {children}
       {iconEnd && <Icon name={iconEnd} size={s.ic} />}
     </motion.button>
-  );
-}
-
-/* ── INPUT ──────────────────────────────────────────────────── */
-export function Input({ value, onChange, placeholder, icon, type = "text", size = "md", style }) {
-  const [focus, setFocus] = useState(false);
-  const h = { sm: 32, md: 40, lg: 46 }[size];
-  return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 8,
-        height: h,
-        padding: "0 12px",
-        background: "var(--bg-canvas)",
-        border: `1px solid ${focus ? "var(--border-focus)" : "var(--border-default)"}`,
-        borderRadius: 10,
-        boxShadow: focus ? "var(--shadow-focus)" : "none",
-        transition: "border-color var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out)",
-        ...style,
-      }}
-    >
-      {icon && <Icon name={icon} size={16} color="var(--text-tertiary)" />}
-      <input
-        type={type}
-        value={value ?? ""}
-        placeholder={placeholder}
-        onChange={(e) => onChange && onChange(e.target.value)}
-        onFocus={() => setFocus(true)}
-        onBlur={() => setFocus(false)}
-        style={{
-          flex: 1,
-          border: 0,
-          outline: 0,
-          background: "transparent",
-          color: "var(--text-primary)",
-          fontFamily: "inherit",
-          fontSize: 14,
-          height: "100%",
-        }}
-      />
-    </div>
   );
 }
 
@@ -408,75 +340,6 @@ export function AvatarGroup({ avatars, size = 28, max = 4 }) {
   );
 }
 
-/* ── SEGMENTED CONTROL ──────────────────────────────────────── */
-export function Segmented({ value, onChange, options }) {
-  const refs = useRef({});
-  const containerRef = useRef(null);
-  const [thumb, setThumb] = useState({ left: 0, width: 0 });
-  useLayoutEffect(() => {
-    const el = refs.current[value];
-    const c = containerRef.current;
-    if (el && c) {
-      const rect = el.getBoundingClientRect();
-      const crect = c.getBoundingClientRect();
-      setThumb({ left: rect.left - crect.left, width: rect.width });
-    }
-  }, [value, options]);
-  return (
-    <div
-      ref={containerRef}
-      style={{
-        position: "relative",
-        display: "inline-flex",
-        padding: 3,
-        background: "var(--bg-muted)",
-        borderRadius: 10,
-        border: "1px solid var(--border-subtle)",
-      }}
-    >
-      <div
-        style={{
-          position: "absolute",
-          top: 3,
-          height: "calc(100% - 6px)",
-          left: thumb.left,
-          width: thumb.width,
-          background: "var(--bg-canvas)",
-          borderRadius: 8,
-          boxShadow: "var(--shadow-sm)",
-          transition: "left var(--dur-base) var(--ease-snap), width var(--dur-base) var(--ease-snap)",
-        }}
-      />
-      {options.map((opt) => {
-        const val = opt.value ?? opt;
-        const label = opt.label ?? opt;
-        return (
-          <button
-            key={val}
-            ref={(el) => (refs.current[val] = el)}
-            onClick={() => onChange(val)}
-            style={{
-              position: "relative",
-              zIndex: 1,
-              padding: "6px 14px",
-              background: "transparent",
-              border: 0,
-              cursor: "pointer",
-              fontFamily: "inherit",
-              fontSize: 13,
-              fontWeight: 500,
-              color: value === val ? "var(--text-primary)" : "var(--text-tertiary)",
-              transition: "color var(--dur-fast) var(--ease-out)",
-            }}
-          >
-            {label}
-          </button>
-        );
-      })}
-    </div>
-  );
-}
-
 /* ── SWITCH ─────────────────────────────────────────────────── */
 export function Switch({ on, onChange }) {
   return (
@@ -511,48 +374,4 @@ export function Switch({ on, onChange }) {
   );
 }
 
-/* ── COUNTER — animated number ──────────────────────────────── */
-export function Counter({ value, duration = 900, prefix = "", suffix = "", decimals = 0 }) {
-  const [v, setV] = useState(0);
-  const startRef = useRef(null);
-  const fromRef = useRef(0);
-  useEffect(() => {
-    fromRef.current = v;
-    startRef.current = performance.now();
-    let raf;
-    const tick = (now) => {
-      const t = Math.min(1, (now - startRef.current) / duration);
-      const eased = 1 - Math.pow(1 - t, 3);
-      const cur = fromRef.current + (value - fromRef.current) * eased;
-      setV(cur);
-      if (t < 1) raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value]);
-  return (
-    <span>
-      {prefix}
-      {v.toFixed(decimals).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-      {suffix}
-    </span>
-  );
-}
-
-/* ── PROGRESS BAR ───────────────────────────────────────────── */
-export function Progress({ value, color = "var(--brand)", height = 6 }) {
-  return (
-    <div style={{ width: "100%", height, background: "var(--bg-muted)", borderRadius: 999, overflow: "hidden" }}>
-      <div
-        style={{
-          height: "100%",
-          width: `${value}%`,
-          background: color,
-          borderRadius: 999,
-          transition: "width var(--dur-slow) var(--ease-out)",
-        }}
-      />
-    </div>
-  );
-}
+/* ── SWITCH, above, is the last shipped primitive. ── */
