@@ -93,14 +93,18 @@ export function Header({ t, lang, setLang, theme, toggleTheme, route, navigate }
       <div className="container header-inner">
         <a
           onClick={() => navigate("home")}
-          style={{ cursor: "pointer", display: "flex", alignItems: "center" }}
+          className="brand-lockup"
           aria-label="Caastor home"
         >
-          {lightLogo ? (
-            <img className="brand-logo" src="/assets/logotype-white.svg" alt="Caastor" style={{ height: 22 }} />
-          ) : (
-            <img className="brand-logo" src="/assets/logo-full-yellow.png" alt="Caastor" />
-          )}
+          {/* One consistent lockup in every state: mascot + wordmark. The
+             wordmark SVG is white; over a light bar it flips to ink via a
+             filter, so the composition never changes between themes. */}
+          <img className="brand-mascot" src="/assets/mascot-yellow.png" alt="" />
+          <img
+            className={"brand-wordmark" + (lightLogo ? "" : " is-ink")}
+            src="/assets/logotype-white.svg"
+            alt="Caastor"
+          />
         </a>
 
         <nav className="nav-links">
