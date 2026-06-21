@@ -1,10 +1,23 @@
 /* Caastor v2 — About page */
+import { useReducedMotion } from "motion/react";
 import { Card, Icon } from "../ds/components.jsx";
 import { Reveal, Eyebrow, SectionHead } from "../components/shell.jsx";
 import { FinalCTA } from "../components/FinalCTA.jsx";
+import "./about-timeline.css";
 
 export function AboutPage({ t, navigate }) {
   const a = t.about;
+  const reduce = useReducedMotion();
+
+  // AboutPage isn't passed a `lang` prop, so derive language from `t` for any
+  // NEW visible labels we introduce here (timeline eyebrow + heading).
+  const isEs = a.missionLabel === "Nuestra misión";
+  const tlEyebrow = isEs ? "Nuestro recorrido" : "Our journey";
+  const tlTitle = isEs ? "Cómo nació Caastor" : "How Caastor came to be";
+
+  const timeline = Array.isArray(a.timeline) ? a.timeline : [];
+  // Branded node icons cycle through the existing icon set.
+  const nodeIcons = ["sparkles", "flag", "activity", "star", "check"];
   return (
     <div className="page-enter">
       <section className="hero surface-canvas">
@@ -38,7 +51,7 @@ export function AboutPage({ t, navigate }) {
                   alt=""
                   style={{ width: "100%", borderRadius: 18, boxShadow: "var(--shadow-lg)", display: "block", aspectRatio: "4/5", objectFit: "cover" }}
                 />
-                <div style={{ position: "absolute", left: -22, bottom: -22, background: "var(--brand)", color: "#0B0B0F", borderRadius: 16, padding: "16px 20px", boxShadow: "var(--shadow-lg)", maxWidth: 220 }}>
+                <div style={{ position: "absolute", left: -22, bottom: -22, background: "var(--brand)", color: "var(--text-on-brand)", borderRadius: 16, padding: "16px 20px", boxShadow: "var(--shadow-lg)", maxWidth: 220 }}>
                   <div className="serif-accent" style={{ fontSize: 19, lineHeight: "24px" }}>
                     &ldquo;{t.footer.tagline}&rdquo;
                   </div>
@@ -64,6 +77,37 @@ export function AboutPage({ t, navigate }) {
           </Reveal>
         </div>
       </section>
+
+      {/* Origin-story timeline */}
+      {timeline.length > 0 && (
+        <section className="section surface-canvas hairline-top">
+          <div className="container">
+            <Reveal>
+              <SectionHead eyebrow={tlEyebrow} title={tlTitle} max={620} />
+            </Reveal>
+            <div className={"cstr-tl" + (reduce ? " cstr-tl--stacked" : "")}>
+              <ol
+                className="cstr-tl__track"
+                aria-label={tlTitle}
+                style={{ listStyle: "none", margin: 0 }}
+              >
+                {timeline.map((m, i) => (
+                  <Reveal key={i} as="li" className="cstr-tl__item" delay={i * 90}>
+                    <span className="cstr-tl__node" aria-hidden="true">
+                      <Icon name={nodeIcons[i % nodeIcons.length]} size={20} />
+                    </span>
+                    <div className="cstr-tl__card">
+                      <div className="cstr-tl__year t-mono">{m.year}</div>
+                      <h3 className="t-h3 cstr-tl__title">{m.title}</h3>
+                      <p className="pretty cstr-tl__body">{m.body}</p>
+                    </div>
+                  </Reveal>
+                ))}
+              </ol>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Values */}
       <section className="section surface-canvas">

@@ -10,24 +10,24 @@ export function FinalCTA({ t, navigate, primaryPilot = true }) {
       <div className="container container-narrow" style={{ textAlign: "center" }}>
         <Reveal>
           <img src="/assets/mascot-yellow.png" alt="" style={{ width: 64, marginBottom: 22 }} />
-          <h2 className="t-display-md balance" style={{ color: "#fff", marginBottom: 18 }}>
+          <h2 className="t-display-md balance" style={{ color: "var(--text-inverse)", marginBottom: 18 }}>
             {f.header}
           </h2>
           <p
             className="pretty"
-            style={{ fontSize: 19, lineHeight: "30px", color: "rgba(255,255,255,0.74)", maxWidth: 560, margin: "0 auto 32px" }}
+            style={{ fontSize: 19, lineHeight: "30px", color: "color-mix(in srgb, var(--text-inverse) 74%, transparent)", maxWidth: 560, margin: "0 auto 32px" }}
           >
             {f.body}
           </p>
           <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-            <Button variant="primary" size="lg" iconEnd="arrowRight" onClick={() => navigate("contact")}>
-              {primaryPilot ? f.ctaPrimary : f.ctaSecondary}
+            <Button variant="primary" size="lg" iconEnd="arrowRight" {...bookingProps}>
+              {f.ctaPrimary}
             </Button>
             <Button
               variant="outline"
               size="lg"
-              style={{ color: "#fff", borderColor: "rgba(255,255,255,0.3)" }}
-              {...bookingProps}
+              style={{ color: "var(--text-inverse)", borderColor: "color-mix(in srgb, var(--text-inverse) 30%, transparent)" }}
+              onClick={() => navigate(primaryPilot ? "pricing" : "contact")}
             >
               {f.ctaSecondary}
             </Button>

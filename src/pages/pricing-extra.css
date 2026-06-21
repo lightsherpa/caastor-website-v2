@@ -1,0 +1,72 @@
+/* Caastor v2 — Pricing billing toggle (co-located, unique class names) */
+
+.pr-billing {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* Segmented control */
+.pr-seg {
+  position: relative;
+  display: inline-flex;
+  padding: 4px;
+  border-radius: 999px;
+  background: var(--bg-muted);
+  border: 1px solid var(--border-default);
+  box-shadow: var(--shadow-xs);
+}
+
+/* Sliding active indicator */
+.pr-seg-thumb {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 4px;
+  width: calc(50% - 4px);
+  border-radius: 999px;
+  background: var(--bg-canvas);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--dur-base) var(--ease-spring);
+  z-index: 0;
+}
+.pr-seg-thumb.is-yearly {
+  transform: translateX(100%);
+}
+
+.pr-seg-btn {
+  position: relative;
+  z-index: 1;
+  appearance: none;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: -0.01em;
+  padding: 7px 18px;
+  border-radius: 999px;
+  color: var(--text-tertiary);
+  transition: color var(--dur-fast) var(--ease-out);
+  white-space: nowrap;
+}
+.pr-seg-btn:hover {
+  color: var(--text-secondary);
+}
+.pr-seg-btn.is-active {
+  color: var(--text-primary);
+}
+
+.pr-save {
+  display: inline-flex;
+  align-items: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pr-seg-thumb {
+    transition: none;
+  }
+}

@@ -1,11 +1,49 @@
 /* Caastor v2 — Pricing page */
+import { useState } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { Button, Card, Badge, Icon } from "../ds/components.jsx";
 import { Reveal, Eyebrow, SectionHead } from "../components/shell.jsx";
 import { FinalCTA } from "../components/FinalCTA.jsx";
 import { FAQList } from "../components/Faq.jsx";
+import "./pricing-extra.css";
 
-function PlanCard({ plan, p, navigate }) {
+function BillingToggle({ p, yearly, setYearly }) {
+  const b = p.billing;
+  return (
+    <div className="pr-billing">
+      <div className="pr-seg" role="group" aria-label={b.monthlyLabel + " / " + b.yearlyLabel}>
+        <span className={"pr-seg-thumb" + (yearly ? " is-yearly" : "")} aria-hidden />
+        <button
+          type="button"
+          className={"pr-seg-btn" + (!yearly ? " is-active" : "")}
+          aria-pressed={!yearly}
+          onClick={() => setYearly(false)}
+        >
+          {b.monthlyLabel}
+        </button>
+        <button
+          type="button"
+          className={"pr-seg-btn" + (yearly ? " is-active" : "")}
+          aria-pressed={yearly}
+          onClick={() => setYearly(true)}
+        >
+          {b.yearlyLabel}
+        </button>
+      </div>
+      <span className="pr-save">
+        <Badge tone="success" dot>
+          {b.saveLabel}
+        </Badge>
+      </span>
+    </div>
+  );
+}
+
+function PlanCard({ plan, p, navigate, yearly }) {
   const isPop = plan.popular;
+  const reduce = useReducedMotion();
+  const amount = yearly ? plan.priceYearly : plan.price;
+  const per = yearly ? p.yearlyPer : p.per;
   return (
     <Card padded={26} hover style={{ height: "100%", position: "relative" }} className={isPop ? "plan-popular-ring" : undefined}>
       {isPop && <span className="plan-crown" />}
@@ -21,13 +59,24 @@ function PlanCard({ plan, p, navigate }) {
           )}
         </div>
         <div>
-          <div className="plan-price">
-            <span style={{ fontWeight: 800, fontSize: 40, letterSpacing: "-0.03em" }}>
+          <div className="plan-price" style={{ display: "flex", alignItems: "baseline" }}>
+            <span style={{ fontWeight: 800, fontSize: 40, letterSpacing: "-0.03em", display: "inline-flex", alignItems: "baseline" }}>
               {p.currency === "$" ? "$" : ""}
-              {plan.price}
+              <AnimatePresence mode="popLayout" initial={false}>
+                <motion.span
+                  key={amount}
+                  initial={reduce ? false : { y: 10, opacity: 0 }}
+                  animate={reduce ? {} : { y: 0, opacity: 1 }}
+                  exit={reduce ? {} : { y: -10, opacity: 0 }}
+                  transition={{ type: "spring", stiffness: 420, damping: 30 }}
+                  style={{ display: "inline-block" }}
+                >
+                  {amount}
+                </motion.span>
+              </AnimatePresence>
               {p.currency === "€" ? " €" : ""}
             </span>
-            <span style={{ fontSize: 15, color: "var(--text-tertiary)", marginLeft: 4 }}>{p.per}</span>
+            <span style={{ fontSize: 15, color: "var(--text-tertiary)", marginLeft: 4 }}>{per}</span>
           </div>
           {p.vat && <div style={{ fontSize: 12, color: "var(--text-quaternary)", marginTop: 2 }}>{p.vat}</div>}
         </div>
@@ -60,6 +109,7 @@ function PlanCard({ plan, p, navigate }) {
 
 export function PricingPage({ t, navigate }) {
   const p = t.pricing;
+  const [yearly, setYearly] = useState(false);
   return (
     <div className="page-enter">
       <section className="hero surface-canvas">
@@ -88,10 +138,15 @@ export function PricingPage({ t, navigate }) {
 
       <section className="surface-canvas" style={{ paddingBottom: 8 }}>
         <div className="container">
+          <Reveal>
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: 32 }}>
+              <BillingToggle p={p} yearly={yearly} setYearly={setYearly} />
+            </div>
+          </Reveal>
           <div className="plan-grid">
             {p.plans.map((plan, i) => (
               <Reveal key={i} delay={i * 70}>
-                <PlanCard plan={plan} p={p} navigate={navigate} />
+                <PlanCard plan={plan} p={p} navigate={navigate} yearly={yearly} />
               </Reveal>
             ))}
           </div>

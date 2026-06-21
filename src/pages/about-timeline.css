@@ -1,0 +1,143 @@
+/* Caastor v2 — About origin-story timeline (co-located styles).
+   Horizontal on desktop, horizontally scrollable on mobile; degrades to a
+   clean stacked list when prefers-reduced-motion or via the .is-stacked
+   modifier set by the component. Uses theme vars only. Unique class names. */
+
+.cstr-tl {
+  position: relative;
+  margin-top: 48px;
+}
+
+/* ── Horizontal track ──────────────────────────────────────── */
+.cstr-tl__track {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(248px, 1fr);
+  gap: 28px;
+  position: relative;
+  padding: 8px 4px 12px;
+}
+
+/* Connector line running through the node row. */
+.cstr-tl__track::before {
+  content: "";
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  top: 21px; /* aligns with node centers (node = 42px) */
+  height: 2px;
+  background: linear-gradient(
+    to right,
+    transparent 0,
+    var(--border-strong, var(--border, rgba(0, 0, 0, 0.12))) 6%,
+    var(--border-strong, var(--border, rgba(0, 0, 0, 0.12))) 94%,
+    transparent 100%
+  );
+  z-index: 0;
+}
+
+.cstr-tl__item {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cstr-tl__node {
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--brand);
+  color: var(--text-on-brand);
+  box-shadow: 0 0 0 6px var(--bg-canvas), 0 6px 18px rgba(var(--brand-glow, 245, 180, 0), 0.32);
+  flex: none;
+}
+
+.cstr-tl__card {
+  background: var(--bg-app, var(--bg-canvas));
+  border: 1px solid var(--border, rgba(0, 0, 0, 0.1));
+  border-radius: 16px;
+  padding: 20px;
+  height: 100%;
+  transition: transform 0.25s var(--ease-out, ease), box-shadow 0.25s var(--ease-out, ease);
+}
+
+.cstr-tl__year {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--brand-strong);
+}
+
+.cstr-tl__title {
+  margin: 6px 0 8px;
+}
+
+.cstr-tl__body {
+  font-size: 14px;
+  line-height: 22px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* Hover lift only where pointers are precise + motion is allowed. */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .cstr-tl__card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md, 0 8px 24px rgba(0, 0, 0, 0.08));
+  }
+}
+
+/* ── Mobile: keep horizontal but allow swipe ───────────────── */
+@media (max-width: 760px) {
+  .cstr-tl__track {
+    grid-auto-columns: 78%;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 16px;
+  }
+  .cstr-tl__item {
+    scroll-snap-align: start;
+  }
+}
+
+/* ── Reduced motion / stacked fallback: clean vertical list ── */
+@media (prefers-reduced-motion: reduce) {
+  .cstr-tl__track,
+  .cstr-tl--stacked .cstr-tl__track {
+    grid-auto-flow: row;
+    grid-auto-columns: auto;
+    overflow-x: visible;
+    scroll-snap-type: none;
+    gap: 20px;
+  }
+  .cstr-tl__track::before {
+    display: none;
+  }
+  .cstr-tl__item {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 16px;
+  }
+}
+
+.cstr-tl--stacked .cstr-tl__track {
+  grid-auto-flow: row;
+  grid-auto-columns: auto;
+  overflow-x: visible;
+  scroll-snap-type: none;
+  gap: 20px;
+}
+.cstr-tl--stacked .cstr-tl__track::before {
+  display: none;
+}
+.cstr-tl--stacked .cstr-tl__item {
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 16px;
+}

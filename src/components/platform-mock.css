@@ -1,0 +1,255 @@
+/* ──────────────────────────────────────────────────────────────────
+   Caastor v2 — PlatformMock enrichment (H-4)
+   Co-located styles for the panels added AROUND the existing project
+   grid: top stat strip, a right-hand activity/feed rail with specialist
+   avatars and a small usage/turnaround chart. Unique `pmx-` class names
+   so nothing collides with the base `.pm-*` rules in motion.css.
+   Tokens only — theme/dark-mode safe. Tuned to stay legible at the
+   hero's smaller render size.
+   ────────────────────────────────────────────────────────────────── */
+
+/* Stat strip — active requests / in review / delivered */
+.pmx-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.pmx-stat {
+  border: 1px solid var(--border-default);
+  border-radius: 10px;
+  background: var(--bg-canvas);
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.pmx-stat-top {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+}
+.pmx-stat-v {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: var(--text-primary);
+}
+.pmx-stat-delta {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--status-success);
+  white-space: nowrap;
+}
+.pmx-stat-label {
+  font-size: 10.5px;
+  font-weight: 500;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pmx-stat-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+/* Two-column body: project grid (flex 1) + activity rail */
+.pmx-body {
+  display: flex;
+  gap: 12px;
+  align-items: stretch;
+  min-width: 0;
+}
+.pmx-body .pm-grid {
+  flex: 1;
+  min-width: 0;
+  align-content: start;
+}
+
+/* Right-hand rail */
+.pmx-rail {
+  width: 184px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.pmx-panel {
+  border: 1px solid var(--border-default);
+  border-radius: 12px;
+  background: var(--bg-canvas);
+  padding: 11px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  box-shadow: var(--shadow-xs);
+}
+.pmx-panel-head {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--text-secondary);
+}
+.pmx-panel-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.pmx-panel-meta {
+  margin-left: auto;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+}
+
+/* Specialist avatars (online team) */
+.pmx-team {
+  display: flex;
+  align-items: center;
+}
+.pmx-team i {
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  border: 1.5px solid var(--bg-canvas);
+  margin-left: -7px;
+  font-style: normal;
+  font-size: 9px;
+  font-weight: 800;
+  color: var(--text-on-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.pmx-team i:first-child {
+  margin-left: 0;
+}
+.pmx-team i.more {
+  background: var(--bg-muted);
+  color: var(--text-secondary);
+}
+.pmx-online {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+}
+.pmx-online::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--status-success);
+  box-shadow: 0 0 0 3px var(--status-success-soft);
+}
+
+/* Activity / feed list */
+.pmx-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.pmx-feed-row {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+.pmx-feed-ic {
+  width: 18px;
+  height: 18px;
+  border-radius: 6px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1px;
+}
+.pmx-feed-txt {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+.pmx-feed-lead {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.pmx-feed-lead b {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+.pmx-feed-time {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-quaternary);
+}
+
+/* Usage / turnaround mini chart */
+.pmx-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 5px;
+  height: 46px;
+}
+.pmx-bar {
+  flex: 1;
+  border-radius: 4px 4px 2px 2px;
+  background: var(--brand-soft);
+  position: relative;
+  min-height: 4px;
+}
+.pmx-bar.peak {
+  background: linear-gradient(180deg, var(--brand), var(--brand-strong));
+}
+.pmx-chart-foot {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9.5px;
+  font-weight: 600;
+  color: var(--text-quaternary);
+}
+.pmx-chart-cap {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+}
+.pmx-chart-num {
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: var(--text-primary);
+}
+.pmx-chart-unit {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+}
+
+/* Hide rail first, then sidebar, as space tightens — keeps the
+   project grid the focus at small/hero sizes. */
+@media (max-width: 720px) {
+  .pmx-rail {
+    display: none;
+  }
+}
+@media (max-width: 480px) {
+  .pmx-stats {
+    grid-template-columns: 1fr 1fr;
+  }
+  .pmx-stat:last-child {
+    display: none;
+  }
+}

@@ -1,0 +1,249 @@
+/* Caastor v2 — Home.jsx co-located styles (H-5, H-6, T-1).
+   New class names only. Themed via CSS vars so light + dark both adapt. */
+
+/* ── H-5 · Centered old-way vs Caastor side-by-side ───────────────── */
+.cmp-wrap {
+  max-width: 920px;
+  margin: 0 auto;
+  text-align: center;
+}
+.cmp-grid {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: stretch;
+  gap: 0;
+  margin-top: 36px;
+  text-align: left;
+}
+.cmp-col {
+  border-radius: 20px;
+  padding: 26px 24px;
+  border: 1px solid var(--border-default);
+  background: var(--bg-app);
+}
+.cmp-col.is-new {
+  background: var(--bg-canvas);
+  border-color: transparent;
+  box-shadow: var(--shadow-md), 0 18px 44px rgba(var(--brand-glow), 0.16);
+}
+.cmp-col-h {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 16px;
+  color: var(--text-tertiary);
+}
+.cmp-col.is-new .cmp-col-h {
+  color: var(--brand-strong);
+}
+.cmp-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  padding: 11px 0;
+  font-size: 14.5px;
+  line-height: 21px;
+  border-top: 1px solid var(--border-subtle);
+}
+.cmp-row:first-of-type {
+  border-top: 0;
+}
+.cmp-col.is-old .cmp-row {
+  color: var(--text-tertiary);
+}
+.cmp-col.is-old .cmp-row > span:last-child {
+  text-decoration: line-through;
+  text-decoration-color: var(--text-quaternary);
+}
+.cmp-col.is-new .cmp-row {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+.cmp-mark {
+  flex-shrink: 0;
+  width: 21px;
+  height: 21px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1px;
+}
+.cmp-mark.is-x {
+  background: var(--bg-muted);
+  color: var(--text-quaternary);
+}
+.cmp-mark.is-check {
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+}
+/* Center divider + arrow between the two columns */
+.cmp-divider {
+  position: relative;
+  width: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cmp-divider::before {
+  content: "";
+  position: absolute;
+  top: 14px;
+  bottom: 14px;
+  left: 50%;
+  width: 1px;
+  background: linear-gradient(var(--border-subtle), var(--border-default), var(--border-subtle));
+}
+.cmp-arrow {
+  position: relative;
+  z-index: 1;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background: var(--brand);
+  color: var(--text-on-brand);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-brand);
+}
+@media (max-width: 760px) {
+  .cmp-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .cmp-divider {
+    width: 100%;
+    height: 48px;
+  }
+  .cmp-divider::before {
+    top: 50%;
+    bottom: auto;
+    left: 14px;
+    right: 14px;
+    width: auto;
+    height: 1px;
+    background: linear-gradient(90deg, var(--border-subtle), var(--border-default), var(--border-subtle));
+  }
+  .cmp-arrow {
+    transform: rotate(90deg);
+  }
+}
+
+/* ── H-6 · Bolder why-bento visuals ──────────────────────────────── */
+/* Turnaround comparison: labelled bars (old vs Caastor) */
+.wv-turn {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+}
+.wv-turn-row {
+  display: grid;
+  grid-template-columns: 76px 1fr auto;
+  align-items: center;
+  gap: 12px;
+}
+.wv-turn-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+}
+.wv-turn-track {
+  height: 14px;
+  border-radius: 999px;
+  background: var(--bg-muted);
+  overflow: hidden;
+}
+.wv-turn-fill {
+  height: 100%;
+  border-radius: 999px;
+  transform-origin: left center;
+}
+.wv-turn-fill.is-slow {
+  background: var(--text-quaternary);
+}
+.wv-turn-fill.is-fast {
+  background: linear-gradient(90deg, var(--brand), var(--brand-strong));
+}
+.wv-turn-val {
+  font-size: 12.5px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+.wv-turn-row.is-slow .wv-turn-val {
+  color: var(--text-tertiary);
+}
+.wv-turn-row.is-fast .wv-turn-val {
+  color: var(--brand-strong);
+}
+@keyframes wvGrow {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+/* Cost vs in-house comparison columns */
+.wv-cost {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 28px;
+  width: 100%;
+  height: 100%;
+  min-height: 150px;
+}
+.wv-cost-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 70px;
+}
+.wv-cost-bar {
+  width: 100%;
+  border-radius: 10px 10px 0 0;
+  transform-origin: bottom center;
+}
+.wv-cost-bar.is-them {
+  background: var(--bg-muted);
+  border: 1px solid var(--border-default);
+}
+.wv-cost-bar.is-us {
+  background: linear-gradient(180deg, var(--brand), var(--brand-strong));
+}
+.wv-cost-cap {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-align: center;
+}
+.wv-cost-amt {
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.wv-cost-col.is-them .wv-cost-amt { color: var(--text-tertiary); }
+.wv-cost-col.is-us .wv-cost-amt { color: var(--brand-strong); }
+@keyframes wvRise {
+  from { transform: scaleY(0); }
+  to   { transform: scaleY(1); }
+}
+
+/* ── T-1 · Branded company monogram chip ─────────────────────────── */
+.tm-monogram {
+  width: 40px;
+  height: 40px;
+  border-radius: 11px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: -0.02em;
+  color: var(--text-on-brand);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), var(--shadow-xs);
+}

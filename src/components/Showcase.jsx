@@ -9,6 +9,24 @@ import { Reveal } from "./shell.jsx";
 const EASE = [0.22, 0.61, 0.36, 1];
 const ICONS = ["star", "grid", "message", "layers"]; // brand, web, social, graphic
 
+/* Concrete deliverables per discipline, keyed to the four service items
+   (brand, web, social, graphic). Bilingual; selected by t.code. Derived
+   from each item's title/body so the tab shows real value, not one line. */
+const DELIVERABLES = {
+  en: [
+    ["Logo suite & visual identity", "Color, type & usage guidelines", "Brand kit ready for any tool"],
+    ["Landing & marketing pages", "Product UI & design systems", "Conversion-ready prototypes"],
+    ["Post sets for every channel", "Short-form video & reels", "Templates you can reuse"],
+    ["Pitch decks & one-pagers", "Infographics & data visuals", "Print & event-ready assets"],
+  ],
+  es: [
+    ["Suite de logo e identidad visual", "Guías de color, tipografía y uso", "Brand kit listo para cualquier herramienta"],
+    ["Landings y páginas de marketing", "UI de producto y design systems", "Prototipos listos para convertir"],
+    ["Sets de posts para cada canal", "Video corto y reels", "Plantillas que puedes reutilizar"],
+    ["Decks de venta y one-pagers", "Infografías y visuales de datos", "Piezas listas para imprenta y eventos"],
+  ],
+};
+
 /* ── Per-discipline mock visuals ─────────────────────────────── */
 function BrandMock() {
   return (
@@ -116,6 +134,8 @@ const MOCKS = [BrandMock, WebMock, SocialMock, GraphicMock];
 
 export function Showcase({ t, navigate }) {
   const items = (t.services?.items || []).slice(0, 4);
+  const es = t.code === "ES";
+  const bullets = DELIVERABLES[es ? "es" : "en"];
   const [active, setActive] = useState(0);
   const reduce = useReducedMotion();
   const stageRef = useRef(null);
@@ -148,12 +168,31 @@ export function Showcase({ t, navigate }) {
                   {on && (
                     <motion.span
                       className="showcase-tab-desc"
-                      initial={{ height: 0, opacity: 0 }}
+                      initial={reduce ? false : { height: 0, opacity: 0 }}
                       animate={{ height: "auto", opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.34, ease: EASE }}
+                      exit={reduce ? { opacity: 0 } : { height: 0, opacity: 0 }}
+                      transition={{ duration: reduce ? 0 : 0.34, ease: EASE }}
                     >
                       <span style={{ display: "block", paddingTop: 6 }}>{it.body}</span>
+                      <span
+                        className="sc-deliverables"
+                        style={{ display: "flex", flexDirection: "column", gap: 7, marginTop: 12 }}
+                      >
+                        {(bullets[i] || []).map((d, di) => (
+                          <span
+                            key={di}
+                            style={{ display: "flex", alignItems: "flex-start", gap: 8, color: "var(--text-secondary)" }}
+                          >
+                            <Icon
+                              name="check"
+                              size={15}
+                              color="var(--brand-strong)"
+                              style={{ flexShrink: 0, marginTop: 3 }}
+                            />
+                            <span>{d}</span>
+                          </span>
+                        ))}
+                      </span>
                     </motion.span>
                   )}
                 </AnimatePresence>
@@ -169,7 +208,13 @@ export function Showcase({ t, navigate }) {
         </div>
       </div>
 
-      <div className="showcase-stage" ref={stageRef}>
+      {/* H-7: drop the framed container — let the visual sit open/borderless.
+         Overrides .showcase-stage framing (can't edit motion.css). */}
+      <div
+        className="showcase-stage"
+        ref={stageRef}
+        style={{ background: "transparent", border: 0, borderRadius: 0, padding: 0, overflow: "visible" }}
+      >
         {/* initial={false} → first mock paints immediately (never blank);
            crossfade layers overlap so content stays visible mid-transition. */}
         <AnimatePresence initial={false}>

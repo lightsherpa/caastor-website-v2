@@ -1,0 +1,91 @@
+/* ──────────────────────────────────────────────────────────────────
+   Caastor v2 — Bundles extras (co-located, owned by Bundles.jsx).
+   New class names only. Theme vars only. Adds: price anchor, use-case
+   block, and the muted "not included" (excludes) list separated from
+   the includes. Keeps the feature card highlighted via existing .bundle.
+   ────────────────────────────────────────────────────────────────── */
+
+/* "From" price anchor */
+.bx-price {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+.bx-price-from {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+.bx-price-amount {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+/* Use-case callout — concrete audience + when to pick it */
+.bx-usecase {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 12px 14px;
+  margin-bottom: 18px;
+  border-radius: 12px;
+  background: var(--bg-muted);
+  border: 1px solid var(--border-default);
+}
+.bx-usecase-ic {
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: var(--brand-strong);
+}
+.bx-usecase-text {
+  font-size: 13.5px;
+  line-height: 20px;
+  color: var(--text-secondary);
+}
+
+/* Section labels above includes / excludes lists */
+.bx-list-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-tertiary);
+  margin-bottom: 10px;
+}
+
+/* Excludes block, clearly separated from the includes above it */
+.bx-excludes {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border-default);
+  margin-bottom: 22px;
+}
+.bx-excl-list {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.bx-excl-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-tertiary);
+}
+.bx-excl-ic {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background: var(--bg-muted);
+  color: var(--text-quaternary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

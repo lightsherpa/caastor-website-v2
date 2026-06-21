@@ -1,7 +1,8 @@
 /* Caastor v2 — Home page */
-import { Button, Card, Badge, Avatar, AvatarGroup, Icon } from "../ds/components.jsx";
+import { Button, Card, Icon } from "../ds/components.jsx";
 import { Reveal, Eyebrow, SectionHead } from "../components/shell.jsx";
-import { ScrollTilt, HeroHeadline, SlotWord, MagneticCursor, Marquee, CountUp } from "../motion/primitives.jsx";
+import { ScrollTilt, HeroHeadline, SlotWord, MagneticCursor, Marquee } from "../motion/primitives.jsx";
+import { useReducedMotion } from "motion/react";
 import { HeroCanvas } from "../motion/HeroCanvas.jsx";
 import { ShowcaseSection } from "../components/Showcase.jsx";
 import { StepsSection } from "../components/Steps.jsx";
@@ -10,6 +11,26 @@ import { BundlesSection } from "../components/Bundles.jsx";
 import { FinalCTA } from "../components/FinalCTA.jsx";
 import { FAQList } from "../components/Faq.jsx";
 import { bookingProps } from "../lib/booking.js";
+import "./home-extras.css";
+
+/* Brand monogram for testimonials: derive 1-2 letters from the company
+   in qt.role (the part after the comma, e.g. "CEO, Geoking" -> "GE"),
+   with a deterministic brand-family tint per company. No fabricated faces. */
+const MONOGRAM_TINTS = [
+  "linear-gradient(135deg, var(--brand), var(--brand-strong))",
+  "linear-gradient(135deg, var(--accent), var(--brand-strong))",
+  "linear-gradient(135deg, var(--brand-strong), #0B1B2F)",
+  "linear-gradient(135deg, #3DD68C, var(--brand-strong))",
+];
+function companyFromRole(role = "") {
+  const after = role.includes(",") ? role.slice(role.indexOf(",") + 1) : role;
+  return after.trim();
+}
+function monogram(company = "") {
+  const words = company.split(/\s+/).filter(Boolean);
+  if (words.length >= 2) return (words[0][0] + words[1][0]).toUpperCase();
+  return company.slice(0, 2).toUpperCase();
+}
 
 /* ── Hero visual — real platform screen in a browser frame, with
    Rever-style floating UI fragments layered forward in 3D ─────── */
@@ -73,6 +94,7 @@ function HeroVisual({ lang }) {
 export function HomePage({ t, lang, navigate, logoNames }) {
   const h = t.home;
   const logos = logoNames || h.logos.names;
+  const reduce = useReducedMotion();
 
   return (
     <div className="page-enter">
@@ -81,10 +103,12 @@ export function HomePage({ t, lang, navigate, logoNames }) {
         <div className="hero-fallback" aria-hidden="true" />
         <HeroCanvas />
         <MagneticCursor />
-        <div className="container" style={{ position: "relative", zIndex: 1, padding: "124px 28px 96px" }}>
+        {/* H-2/H-3: tightened hero so headline + rotor + one sub line stay
+            <= 4 lines and the platform mock sits above the fold on a laptop. */}
+        <div className="container" style={{ position: "relative", zIndex: 1, padding: "84px 28px 52px" }}>
           <div className="hero-stack">
             <Reveal>
-              <div style={{ marginBottom: 24, display: "flex", justifyContent: "center" }}>
+              <div style={{ marginBottom: 18, display: "flex", justifyContent: "center" }}>
                 <Eyebrow>{h.hero.eyebrow}</Eyebrow>
               </div>
             </Reveal>
@@ -93,7 +117,7 @@ export function HomePage({ t, lang, navigate, logoNames }) {
               serif={h.hero.h1serif}
               b={h.hero.h1b}
               className="t-display-lg balance hero-h1"
-              style={{ marginBottom: 16, textAlign: "center" }}
+              style={{ marginBottom: 14, textAlign: "center" }}
             />
             <Reveal delay={90}>
               <div className="hero-rotor">
@@ -107,8 +131,9 @@ export function HomePage({ t, lang, navigate, logoNames }) {
               </div>
             </Reveal>
             {/* Rendered statically (no fade) so it's the LCP element and
-               paints with first paint instead of after the reveal. */}
-            <p className="pretty" style={{ fontSize: 19, lineHeight: "30px", color: "rgba(255,255,255,0.72)", maxWidth: 580, margin: "20px auto 34px", textAlign: "center" }}>
+               paints with first paint instead of after the reveal.
+               Intentional on-dark-hero white kept. */}
+            <p className="pretty" style={{ fontSize: 18, lineHeight: "28px", color: "rgba(255,255,255,0.72)", maxWidth: 560, margin: "16px auto 26px", textAlign: "center" }}>
               {h.hero.sub}
             </p>
             <Reveal delay={180}>
@@ -123,7 +148,8 @@ export function HomePage({ t, lang, navigate, logoNames }) {
             </Reveal>
           </div>
 
-          <div className="hero-stage">
+          {/* marginTop override pulls the stage up so it crests the fold */}
+          <div className="hero-stage" style={{ marginTop: 32 }}>
             <ScrollTilt>
               <HeroVisual lang={lang} />
             </ScrollTilt>
@@ -156,59 +182,58 @@ export function HomePage({ t, lang, navigate, logoNames }) {
         </div>
       </section>
 
-      {/* 3 · POSITIONING — editorial old-way vs Caastor contrast */}
+      {/* 3 · POSITIONING — H-5: centered, true old-way vs Caastor side-by-side,
+          rendered from h.intro.compare with ✕ vs ✓ rows + center arrow. */}
       <section className="section surface-canvas">
         <div className="container">
-          <div className="pos-wrap">
-            <div className="pos-lead">
-              <Reveal>
-                <h2 className="t-display-md balance" style={{ margin: "0 0 20px" }}>
-                  {h.intro.headlineA} <span className="serif-accent">{h.intro.headlineSerif}</span>
-                </h2>
-              </Reveal>
-              <Reveal delay={120}>
-                <p className="pretty" style={{ fontSize: 19, lineHeight: "31px", color: "var(--text-secondary)", maxWidth: 460, marginBottom: 26 }}>
-                  {h.intro.body}
-                </p>
-              </Reveal>
-              <Reveal delay={160}>
-                <span
-                  className="text-link"
-                  style={{ fontSize: 16, cursor: "pointer" }}
-                  onClick={() => document.getElementById("how")?.scrollIntoView({ behavior: "smooth" })}
-                >
-                  {h.intro.cta}
-                </span>
-              </Reveal>
-            </div>
+          <div className="cmp-wrap">
+            <Reveal>
+              <h2 className="t-display-md balance" style={{ margin: "0 auto 16px", maxWidth: 640 }}>
+                {h.intro.headlineA} <span className="serif-accent">{h.intro.headlineSerif}</span>
+              </h2>
+            </Reveal>
+            <Reveal delay={90}>
+              <p className="pretty" style={{ fontSize: 18, lineHeight: "29px", color: "var(--text-secondary)", maxWidth: 520, margin: "0 auto" }}>
+                {h.intro.body}
+              </p>
+            </Reveal>
 
-            <Reveal delay={120} style={{ minWidth: 0 }}>
-              <div className="pos-compare">
-                <div className="pos-col is-old">
-                  <div className="pos-col-h">{lang === "es" ? "Lo de siempre" : "The old way"}</div>
-                  {(lang === "es"
-                    ? ["Briefs perdidos en cadenas de email", "Plazos de 3 a 4 semanas", "Un junior distinto cada vez", "Presupuestos por proyecto", "Recursos dispersos en chats"]
-                    : ["Briefs lost in email threads", "Three to four week turnarounds", "A different junior each time", "Per-project quotes and scope creep", "Assets scattered across chats"]
-                  ).map((x, i) => (
-                    <div key={i} className="pos-row is-old">
-                      <span className="pos-x"><Icon name="plus" size={12} style={{ transform: "rotate(45deg)" }} /></span>
+            <Reveal delay={140} style={{ minWidth: 0 }}>
+              <div className="cmp-grid">
+                <div className="cmp-col is-old">
+                  <div className="cmp-col-h">{h.intro.compare.oldLabel}</div>
+                  {h.intro.compare.old.map((x, i) => (
+                    <div key={i} className="cmp-row">
+                      <span className="cmp-mark is-x"><Icon name="plus" size={12} style={{ transform: "rotate(45deg)" }} /></span>
                       <span>{x}</span>
                     </div>
                   ))}
                 </div>
-                <div className="pos-col is-new">
-                  <div className="pos-col-h">{lang === "es" ? "Con Caastor" : "With Caastor"}</div>
-                  {(lang === "es"
-                    ? ["Una plataforma para briefs, feedback y recursos", "Primeras propuestas en 48 horas", "El mismo equipo senior, siempre", "Una tarifa plana al mes, cancela cuando quieras", "Toda tu Brand Library en un sitio"]
-                    : ["One platform for briefs, feedback and assets", "First drafts in 48 hours", "The same senior team, every time", "One flat monthly fee, cancel anytime", "Your whole Brand Library in one place"]
-                  ).map((x, i) => (
-                    <div key={i} className="pos-row is-new">
-                      <span className="pos-check"><Icon name="check" size={13} /></span>
+
+                <div className="cmp-divider" aria-hidden="true">
+                  <span className="cmp-arrow"><Icon name="arrowRight" size={18} /></span>
+                </div>
+
+                <div className="cmp-col is-new">
+                  <div className="cmp-col-h">{h.intro.compare.newLabel}</div>
+                  {h.intro.compare.new.map((x, i) => (
+                    <div key={i} className="cmp-row">
+                      <span className="cmp-mark is-check"><Icon name="check" size={13} /></span>
                       <span>{x}</span>
                     </div>
                   ))}
                 </div>
               </div>
+            </Reveal>
+
+            <Reveal delay={180}>
+              <span
+                className="text-link"
+                style={{ fontSize: 16, cursor: "pointer", display: "inline-block", marginTop: 28 }}
+                onClick={() => document.getElementById("how")?.scrollIntoView({ behavior: "smooth" })}
+              >
+                {h.intro.cta}
+              </span>
             </Reveal>
           </div>
         </div>
@@ -224,7 +249,8 @@ export function HomePage({ t, lang, navigate, logoNames }) {
             <SectionHead title={h.why.header} max={680} />
           </Reveal>
           <div className="why-bento">
-            {/* Quality — large cell */}
+            {/* Quality — large cell: brand swatches + senior team chips, then
+                a real cost-vs-in-house comparison chart (H-6). */}
             <Reveal className="why-cell why-cell--lg" delay={0}>
               <div className="why-visual">
                 <div className="why-swatches">
@@ -232,10 +258,19 @@ export function HomePage({ t, lang, navigate, logoNames }) {
                     <span key={i} style={{ background: c }} />
                   ))}
                 </div>
-                <AvatarGroup
-                  size={34}
-                  avatars={[{ name: "Ana L" }, { name: "Sam K" }, { name: "Mara R" }, { name: "Joe T" }, { name: "Bea N" }]}
-                />
+                <div className="wv-cost" role="img"
+                  aria-label={lang === "es" ? "Coste de Caastor frente a un equipo interno" : "Caastor cost versus in house team"}>
+                  <div className="wv-cost-col is-them">
+                    <span className="wv-cost-amt">$12k+</span>
+                    <div className="wv-cost-bar is-them" style={{ height: 120, transform: reduce ? "none" : "scaleY(0)", animation: reduce ? "none" : "wvRise 0.7s 0.1s cubic-bezier(0.22,0.61,0.36,1) forwards" }} />
+                    <span className="wv-cost-cap">{lang === "es" ? "Equipo interno" : "In house team"}</span>
+                  </div>
+                  <div className="wv-cost-col is-us">
+                    <span className="wv-cost-amt">{lang === "es" ? "Desde 750 €" : "From $800"}</span>
+                    <div className="wv-cost-bar is-us" style={{ height: 48, transform: reduce ? "none" : "scaleY(0)", animation: reduce ? "none" : "wvRise 0.7s 0.22s cubic-bezier(0.22,0.61,0.36,1) forwards" }} />
+                    <span className="wv-cost-cap">Caastor</span>
+                  </div>
+                </div>
               </div>
               <div className="why-body">
                 <h3 className="t-h3">{h.why.benefits[0].title}</h3>
@@ -243,7 +278,7 @@ export function HomePage({ t, lang, navigate, logoNames }) {
               </div>
             </Reveal>
 
-            {/* Friction — merge visual */}
+            {/* Friction — many tools merge into one platform */}
             <Reveal className="why-cell" delay={90}>
               <div className="why-merge">
                 {[["inbox", lang === "es" ? "Briefs" : "Briefs"], ["message", lang === "es" ? "Feedback" : "Feedback"], ["layers", lang === "es" ? "Recursos" : "Assets"]].map(([ic, lb], i) => (
@@ -258,13 +293,25 @@ export function HomePage({ t, lang, navigate, logoNames }) {
               </div>
             </Reveal>
 
-            {/* Speed — big number + bars */}
+            {/* Speed — turnaround comparison bars with labels (H-6) */}
             <Reveal className="why-cell why-cell--speed" delay={150}>
-              <div className="why-speed">
-                <div className="why-48"><span>48</span><i>h</i></div>
-                <div className="why-bars">
-                  {[40, 64, 88, 100].map((hgt, i) => (
-                    <span key={i} style={{ height: hgt + "%" }} />
+              <div className="why-visual" style={{ minHeight: 0 }}>
+                <div className="wv-turn">
+                  {[
+                    { name: lang === "es" ? "Agencia" : "Agency", val: lang === "es" ? "3 a 4 sem" : "3 to 4 wks", w: "100%", slow: true },
+                    { name: lang === "es" ? "Freelance" : "Freelance", val: lang === "es" ? "1 sem" : "1 wk", w: "62%", slow: true },
+                    { name: "Caastor", val: lang === "es" ? "48 h" : "48 h", w: "26%", slow: false },
+                  ].map((r, i) => (
+                    <div key={i} className={"wv-turn-row " + (r.slow ? "is-slow" : "is-fast")}>
+                      <span className="wv-turn-name">{r.name}</span>
+                      <div className="wv-turn-track">
+                        <span
+                          className={"wv-turn-fill " + (r.slow ? "is-slow" : "is-fast")}
+                          style={{ width: r.w, transform: reduce ? "none" : "scaleX(0)", animation: reduce ? "none" : `wvGrow 0.65s ${0.12 + i * 0.12}s cubic-bezier(0.22,0.61,0.36,1) forwards` }}
+                        />
+                      </div>
+                      <span className="wv-turn-val">{r.val}</span>
+                    </div>
                   ))}
                 </div>
               </div>
@@ -292,7 +339,9 @@ export function HomePage({ t, lang, navigate, logoNames }) {
           <Reveal>
             <div style={{ marginTop: 48 }}>
               <Marquee speed={52} gap={20}>
-                {h.testimonials.quotes.map((qt, i) => (
+                {h.testimonials.quotes.map((qt, i) => {
+                  const company = companyFromRole(qt.role);
+                  return (
                   <div key={i} className="tm-card">
                     <Card padded={26} style={{ height: "100%" }}>
                       <div className="tm-inner">
@@ -302,7 +351,15 @@ export function HomePage({ t, lang, navigate, logoNames }) {
                         </div>
                         <p className="balance tm-quote">&ldquo;{qt.quote}&rdquo;</p>
                         <div className="tm-person">
-                          <Avatar src={qt.photo} name={qt.name} size={40} />
+                          {/* T-1: branded company monogram chip (no fabricated faces) */}
+                          <span
+                            className="tm-monogram"
+                            style={{ background: MONOGRAM_TINTS[i % MONOGRAM_TINTS.length] }}
+                            role="img"
+                            aria-label={company}
+                          >
+                            {monogram(company)}
+                          </span>
                           <div>
                             <div style={{ fontWeight: 700, fontSize: 14 }}>{qt.name}</div>
                             <div style={{ fontSize: 13, color: "var(--text-tertiary)" }}>{qt.role}</div>
@@ -311,49 +368,15 @@ export function HomePage({ t, lang, navigate, logoNames }) {
                       </div>
                     </Card>
                   </div>
-                ))}
+                  );
+                })}
               </Marquee>
             </div>
           </Reveal>
         </div>
       </section>
 
-      {/* 8 · PRICING TEASER */}
-      <section className="section surface-app hairline-top">
-        <div className="container">
-          <Reveal>
-            <Card padded={0} style={{ overflow: "hidden", borderRadius: 16 }}>
-              <div style={{ display: "grid", gridTemplateColumns: "1.1fr 1fr", alignItems: "stretch" }} className="grid-2">
-                <div style={{ padding: "48px 44px" }}>
-                  <h2 className="t-display-sm balance" style={{ marginBottom: 16 }}>
-                    {h.pricingTeaser.header}
-                  </h2>
-                  <p className="pretty" style={{ fontSize: 17, lineHeight: "27px", color: "var(--text-secondary)", maxWidth: 420, marginBottom: 28 }}>
-                    {h.pricingTeaser.sub}
-                  </p>
-                  <Button variant="primary" size="lg" iconEnd="arrowRight" onClick={() => navigate("pricing")}>
-                    {t.cta.compare}
-                  </Button>
-                </div>
-                <div style={{ background: "var(--bg-inverse)", color: "var(--text-inverse)", padding: "48px 44px", display: "flex", flexDirection: "column", justifyContent: "center", gap: 18 }}>
-                  {[
-                    { v: 60, suffix: "%", l: lang === "es" ? "más rápido que contratar" : "faster than hiring in-house" },
-                    { v: 48, suffix: "h", l: lang === "es" ? "primeras propuestas" : "to first drafts" },
-                    { v: null, l: lang === "es" ? "peticiones, una tarifa plana" : "requests, one flat fee" },
-                  ].map((s, i) => (
-                    <div key={i} style={{ display: "flex", alignItems: "baseline", gap: 16 }}>
-                      <span style={{ fontWeight: 800, fontSize: 40, letterSpacing: "-0.03em", color: "var(--brand)", minWidth: 90 }}>
-                        {s.v === null ? "∞" : <CountUp to={s.v} suffix={s.suffix} />}
-                      </span>
-                      <span style={{ fontSize: 15, color: "rgba(255,255,255,0.7)" }}>{s.l}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </Card>
-          </Reveal>
-        </div>
-      </section>
+      {/* 8 · PRICING TEASER — removed (P-1) */}
 
       {/* 9 · FAQ TEASER */}
       <section className="section surface-canvas">

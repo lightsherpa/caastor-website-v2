@@ -28,11 +28,16 @@ const VERT = `
   }
 `;
 
-// A glowing, undulating design grid (amber→indigo) that fades at the
-// edges — a creative platform's "canvas", not a starfield.
+// A glowing, undulating design grid that fades at the edges — a creative
+// platform's "canvas", not a starfield. On-brand: the field reads as warm
+// Caastor yellow on dark, with indigo only as a tasteful accent in the
+// troughs. Ramp: brand-strong amber base → brand yellow crests, with a
+// restrained indigo tint kept to the lowest valleys so the overall cast
+// stays warm (never an off-brand purple wash under additive blending).
 const FRAG = `
-  uniform vec3 uColorA;
-  uniform vec3 uColorB;
+  uniform vec3 uColorA;   // brand yellow — crests / highlights
+  uniform vec3 uColorB;   // accent indigo — troughs (used sparingly)
+  uniform vec3 uColorBase;// deep warm amber — dominant mid/base tone
   uniform float uGrid;
   varying vec2 vUv;
   varying float vH;
@@ -43,12 +48,25 @@ const FRAG = `
     float line = 1.0 - min(min(grid.x, grid.y), 1.0);
     float vig = smoothstep(0.95, 0.18, length(vUv - 0.5));
     float h = clamp(vH * 0.5 + 0.5, 0.0, 1.0);
-    vec3 col = mix(uColorB, uColorA, h);
-    float alpha = line * vig * (0.28 + 0.72 * h);
+    // Warm core: amber base lifts toward bright brand yellow on the crests.
+    vec3 warm = mix(uColorBase, uColorA, smoothstep(0.15, 1.0, h));
+    // Indigo only tints the deepest troughs, then fades out fast.
+    float indigo = (1.0 - smoothstep(0.0, 0.34, h)) * 0.4;
+    vec3 col = mix(warm, uColorB, indigo);
+    float alpha = line * vig * (0.30 + 0.70 * h);
     if (alpha < 0.004) discard;
     gl_FragColor = vec4(col, alpha);
   }
 `;
+
+/* Caastor brand colors — baked from src/styles/tokens.css (citrus / default
+   Caastor palette). Keep these in sync with the CSS tokens.
+     --brand        #F5B400  vivid brand yellow      → crests / highlights
+     --brand-strong #C68B00  deep warm amber         → dominant base tone
+     --accent       #4F46E5  electric indigo accent  → trough tint only */
+const BRAND_YELLOW = 0xf5b400; // var(--brand)
+const BRAND_AMBER  = 0xc68b00; // var(--brand-strong)
+const ACCENT_INDIGO = 0x4f46e5; // var(--accent)
 
 function hasWebGL() {
   try {
@@ -78,8 +96,9 @@ function initScene(THREE, canvas) {
     uniforms: {
       uTime: { value: 0 },
       uGrid: { value: 30.0 },
-      uColorA: { value: new THREE.Color(0xf5b400) },
-      uColorB: { value: new THREE.Color(0x4f46e5) },
+      uColorA: { value: new THREE.Color(BRAND_YELLOW) },
+      uColorB: { value: new THREE.Color(ACCENT_INDIGO) },
+      uColorBase: { value: new THREE.Color(BRAND_AMBER) },
       uMouse: { value: new THREE.Vector2(0, 0) },
     },
     vertexShader: VERT,
@@ -178,5 +197,28 @@ export function HeroCanvas() {
     };
   }, [reduce]);
 
-  return <canvas ref={ref} className={"hero-canvas" + (on ? " is-on" : "")} aria-hidden="true" />;
+  // Branded warm-on-dark gradient fallback shown until the WebGL field is
+  // live (or whenever WebGL is skipped). Baked from the same brand tokens:
+  // brand yellow + a faint indigo accent over a near-black warm base — never
+  // a cold/off-brand purple wash. Inline so it overrides the shared sheet
+  // without editing it; cleared once the shader is on so it can't muddy the
+  // additive field.
+  const fallbackStyle = on
+    ? undefined
+    : {
+        background:
+          "radial-gradient(60% 50% at 70% 26%, rgba(245, 180, 0, 0.26), transparent 70%)," +
+          "radial-gradient(46% 46% at 24% 80%, rgba(79, 70, 229, 0.16), transparent 74%)," +
+          "radial-gradient(120% 120% at 50% 0%, rgba(198, 139, 0, 0.12), transparent 60%)," +
+          "#0A0A0C",
+      };
+
+  return (
+    <canvas
+      ref={ref}
+      className={"hero-canvas" + (on ? " is-on" : "")}
+      style={fallbackStyle}
+      aria-hidden="true"
+    />
+  );
 }

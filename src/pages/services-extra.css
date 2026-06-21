@@ -1,0 +1,48 @@
+/* Caastor v2 — Services page co-located styles (S-1 animated visuals).
+   Theme vars only. Unique class names (svc-*) to avoid collisions. */
+
+.svc-stage {
+  position: relative;
+  width: 96px;
+  height: 72px;
+  flex-shrink: 0;
+  border-radius: 14px;
+  overflow: hidden;
+  background: linear-gradient(150deg, var(--brand-soft), var(--bg-app));
+  border: 1px solid var(--border-default);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.svc-stage--accent {
+  background: linear-gradient(150deg, var(--accent-soft), var(--bg-app));
+}
+
+.svc-stage-glow {
+  position: absolute;
+  inset: -30% -10% auto;
+  height: 70%;
+  background: radial-gradient(60% 80% at 50% 0%, rgba(var(--brand-glow), 0.22), transparent 70%);
+  pointer-events: none;
+}
+
+.svc-stage--accent .svc-stage-glow {
+  background: radial-gradient(60% 80% at 50% 0%, rgba(var(--brand-glow), 0.16), transparent 70%);
+}
+
+.svc-svg {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Honour reduced-motion at the CSS layer too — the JS already swaps to
+   static frames, this just hard-stops any residual transition. */
+@media (prefers-reduced-motion: reduce) {
+  .svc-svg * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
