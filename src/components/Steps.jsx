@@ -112,8 +112,6 @@ export function StepsSection({ t, lang }) {
     );
   }
 
-  const fill = steps.length > 1 ? active / (steps.length - 1) : 1;
-
   return (
     <section id="how" className="section surface-app hairline-top">
       <div className="container">
@@ -127,24 +125,17 @@ export function StepsSection({ t, lang }) {
           onMouseEnter={() => setPaused(true)}
           onMouseLeave={() => setPaused(false)}
         >
-          {/* connector rail */}
-          <div className="steps-rail">
-            <div className="steps-rail-line">
-              <motion.span
-                className="steps-rail-fill"
-                animate={{ scaleX: fill }}
-                transition={{ duration: 0.6, ease: EASE }}
-              />
-            </div>
+          {/* step pills — completed show a check, current is branded */}
+          <div className="steps-pills">
             {steps.map((s, i) => (
               <button
                 key={i}
-                className={"steps-node" + (i <= active ? " reached" : "") + (i === active ? " on" : "")}
+                className={"steps-pill" + (i < active ? " is-done" : "") + (i === active ? " on" : "")}
                 onClick={() => setActive(i)}
                 aria-current={i === active}
               >
-                <span className="steps-node-dot">{i < active ? <Icon name="check" size={15} /> : s.n}</span>
-                <span className="steps-node-label">{s.title}</span>
+                <span className="steps-pill-dot">{i < active ? <Icon name="check" size={13} /> : i + 1}</span>
+                <span className="steps-pill-label">{s.title}</span>
               </button>
             ))}
           </div>
@@ -152,6 +143,7 @@ export function StepsSection({ t, lang }) {
           {/* focus panel */}
           <div className="steps-panel">
             <div className="steps-copy">
+              <span className="steps-ghost" aria-hidden="true">{steps[active].n}</span>
               <AnimatePresence mode="wait">
                 <motion.div
                   key={active}
@@ -160,7 +152,7 @@ export function StepsSection({ t, lang }) {
                   exit={{ opacity: 0, y: -12 }}
                   transition={{ duration: 0.4, ease: EASE }}
                 >
-                  <span className="steps-step-n">{steps[active].n}</span>
+                  <span className="steps-step-n">{lang === "es" ? "Paso" : "Step"} {steps[active].n}</span>
                   <h3 className="t-h2 steps-step-title">{steps[active].title}</h3>
                   <p className="pretty steps-step-body">{steps[active].body}</p>
                 </motion.div>
