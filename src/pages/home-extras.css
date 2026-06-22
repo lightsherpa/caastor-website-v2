@@ -1,134 +1,137 @@
 /* Caastor v2 — Home.jsx co-located styles (H-5, H-6, T-1).
    New class names only. Themed via CSS vars so light + dark both adapt. */
 
-/* ── H-5 · Centered old-way vs Caastor side-by-side ───────────────── */
-.cmp-wrap {
-  max-width: 920px;
-  margin: 0 auto;
-  text-align: center;
+/* ── H-5 · Dark premium positioning: old way vs Caastor + ambient waves ─ */
+.pos-section {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  background:
+    radial-gradient(120% 90% at 50% -10%, rgba(245, 180, 0, 0.1), transparent 58%),
+    linear-gradient(180deg, #0c0b09, #0a0a0c);
 }
-.cmp-grid {
+.pos-waves { z-index: 0; }
+.pos-section > .container { position: relative; z-index: 1; }
+
+.cmp-wrap { max-width: 980px; margin: 0 auto; text-align: center; }
+.pos-h2 { margin: 0 auto 16px; max-width: 680px; color: #fff; }
+.pos-h2 .serif-accent { color: var(--brand); }
+.pos-sub {
+  font-size: 18px;
+  line-height: 29px;
+  color: rgba(255, 255, 255, 0.66);
+  max-width: 540px;
+  margin: 0 auto;
+}
+
+/* Single elevated glass panel holding both balanced halves. */
+.cmp-panel {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: stretch;
   gap: 0;
-  margin-top: 36px;
+  margin-top: 40px;
   text-align: left;
+  padding: 10px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
-.cmp-col {
-  border-radius: 20px;
-  padding: 26px 24px;
-  border: 1px solid var(--border-default);
-  background: var(--bg-app);
-}
+.cmp-col { padding: 24px 26px; border-radius: 16px; }
 .cmp-col.is-new {
-  background: var(--bg-canvas);
-  border-color: transparent;
-  box-shadow: var(--shadow-md), 0 18px 44px rgba(var(--brand-glow), 0.16);
+  background: linear-gradient(180deg, rgba(245, 180, 0, 0.1), rgba(245, 180, 0, 0.03));
+  box-shadow: inset 0 0 0 1px rgba(245, 180, 0, 0.18);
 }
 .cmp-col-h {
   font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  margin-bottom: 16px;
-  color: var(--text-tertiary);
+  letter-spacing: 0.08em;
+  margin-bottom: 14px;
+  color: rgba(255, 255, 255, 0.42);
 }
-.cmp-col.is-new .cmp-col-h {
-  color: var(--brand-strong);
-}
+.cmp-col.is-new .cmp-col-h { color: var(--brand); }
 .cmp-row {
   display: flex;
   align-items: flex-start;
-  gap: 11px;
-  padding: 11px 0;
+  gap: 12px;
+  padding: 12px 0;
   font-size: 14.5px;
   line-height: 21px;
-  border-top: 1px solid var(--border-subtle);
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
 }
-.cmp-row:first-of-type {
-  border-top: 0;
-}
-.cmp-col.is-old .cmp-row {
-  color: var(--text-tertiary);
-}
+.cmp-row:first-of-type { border-top: 0; }
+.cmp-col.is-old .cmp-row { color: rgba(255, 255, 255, 0.4); }
 .cmp-col.is-old .cmp-row > span:last-child {
   text-decoration: line-through;
-  text-decoration-color: var(--text-quaternary);
+  text-decoration-color: rgba(255, 255, 255, 0.22);
 }
-.cmp-col.is-new .cmp-row {
-  color: var(--text-primary);
-  font-weight: 500;
-}
+.cmp-col.is-new .cmp-row { color: rgba(255, 255, 255, 0.92); font-weight: 500; }
 .cmp-mark {
   flex-shrink: 0;
-  width: 21px;
-  height: 21px;
+  width: 22px;
+  height: 22px;
   border-radius: 999px;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-top: 1px;
 }
-.cmp-mark.is-x {
-  background: var(--bg-muted);
-  color: var(--text-quaternary);
-}
-.cmp-mark.is-check {
-  background: var(--brand-soft);
-  color: var(--brand-strong);
-}
-/* Center divider + arrow between the two columns */
-.cmp-divider {
-  position: relative;
-  width: 64px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+.cmp-mark.is-x { background: rgba(255, 255, 255, 0.07); color: rgba(255, 255, 255, 0.4); }
+.cmp-mark.is-check { background: var(--brand); color: #0b0b0f; box-shadow: 0 0 0 4px rgba(245, 180, 0, 0.12); }
+
+/* Center divider + arrow */
+.cmp-divider { position: relative; width: 56px; display: flex; align-items: center; justify-content: center; }
 .cmp-divider::before {
   content: "";
   position: absolute;
-  top: 14px;
-  bottom: 14px;
+  top: 18px;
+  bottom: 18px;
   left: 50%;
   width: 1px;
-  background: linear-gradient(var(--border-subtle), var(--border-default), var(--border-subtle));
+  background: linear-gradient(transparent, rgba(255, 255, 255, 0.16), transparent);
 }
 .cmp-arrow {
   position: relative;
   z-index: 1;
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
   border-radius: 999px;
   background: var(--brand);
-  color: var(--text-on-brand);
+  color: #0b0b0f;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: var(--shadow-brand);
+  box-shadow: 0 8px 24px rgba(245, 180, 0, 0.4);
 }
+
+.pos-link {
+  display: inline-block;
+  margin-top: 30px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--brand);
+  transition: opacity 0.2s;
+}
+.pos-link:hover { opacity: 0.82; }
+
 @media (max-width: 760px) {
-  .cmp-grid {
-    grid-template-columns: 1fr;
-    gap: 14px;
-  }
-  .cmp-divider {
-    width: 100%;
-    height: 48px;
-  }
+  .cmp-panel { grid-template-columns: 1fr; gap: 10px; padding: 8px; }
+  .cmp-divider { width: 100%; height: 44px; }
   .cmp-divider::before {
     top: 50%;
     bottom: auto;
-    left: 14px;
-    right: 14px;
+    left: 16px;
+    right: 16px;
     width: auto;
     height: 1px;
-    background: linear-gradient(90deg, var(--border-subtle), var(--border-default), var(--border-subtle));
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.16), transparent);
   }
-  .cmp-arrow {
-    transform: rotate(90deg);
-  }
+  .cmp-arrow { transform: rotate(90deg); }
 }
 
 /* ── H-6 · Bolder why-bento visuals ──────────────────────────────── */

@@ -4,6 +4,7 @@ import { Reveal, Eyebrow, SectionHead } from "../components/shell.jsx";
 import { ScrollTilt, HeroHeadline, SlotWord, MagneticCursor, Marquee } from "../motion/primitives.jsx";
 import { useReducedMotion } from "motion/react";
 import { HeroCanvas } from "../motion/HeroCanvas.jsx";
+import { Waves } from "../motion/Waves.jsx";
 import { ShowcaseSection } from "../components/Showcase.jsx";
 import { StepsSection } from "../components/Steps.jsx";
 import { PlatformMock } from "../components/PlatformMock.jsx";
@@ -182,24 +183,23 @@ export function HomePage({ t, lang, navigate, logoNames }) {
         </div>
       </section>
 
-      {/* 3 · POSITIONING — H-5: centered, true old-way vs Caastor side-by-side,
-          rendered from h.intro.compare with ✕ vs ✓ rows + center arrow. */}
-      <section className="section surface-canvas">
+      {/* 3 · POSITIONING — H-5: dark, premium old-way vs Caastor with an
+          ambient brand-tinted wave field behind an elevated glass panel. */}
+      <section className="section pos-section">
+        <Waves className="pos-waves" strokeColor="rgba(245,180,0,0.13)" />
         <div className="container">
           <div className="cmp-wrap">
             <Reveal>
-              <h2 className="t-display-md balance" style={{ margin: "0 auto 16px", maxWidth: 640 }}>
+              <h2 className="t-display-md balance pos-h2">
                 {h.intro.headlineA} <span className="serif-accent">{h.intro.headlineSerif}</span>
               </h2>
             </Reveal>
             <Reveal delay={90}>
-              <p className="pretty" style={{ fontSize: 18, lineHeight: "29px", color: "var(--text-secondary)", maxWidth: 520, margin: "0 auto" }}>
-                {h.intro.body}
-              </p>
+              <p className="pretty pos-sub">{h.intro.body}</p>
             </Reveal>
 
             <Reveal delay={140} style={{ minWidth: 0 }}>
-              <div className="cmp-grid">
+              <div className="cmp-panel">
                 <div className="cmp-col is-old">
                   <div className="cmp-col-h">{h.intro.compare.oldLabel}</div>
                   {h.intro.compare.old.map((x, i) => (
@@ -228,8 +228,7 @@ export function HomePage({ t, lang, navigate, logoNames }) {
 
             <Reveal delay={180}>
               <span
-                className="text-link"
-                style={{ fontSize: 16, cursor: "pointer", display: "inline-block", marginTop: 28 }}
+                className="pos-link"
                 onClick={() => document.getElementById("how")?.scrollIntoView({ behavior: "smooth" })}
               >
                 {h.intro.cta}
