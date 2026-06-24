@@ -1,0 +1,340 @@
+/* Showcase redesign — premium interactive feature tabs.
+   Co-located, unique `scx-` namespace. Overrides the shared `.showcase-*`
+   rules from motion.css without editing them. Tokens only. */
+
+.scx {
+  position: relative;
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 28px;
+  align-items: stretch;
+}
+@media (max-width: 900px) {
+  .scx {
+    grid-template-columns: 1fr;
+    gap: 22px;
+  }
+}
+
+/* ── Tab rail ─────────────────────────────────────────────── */
+.scx-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.scx-railhead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 4px 6px;
+}
+.scx-railhead-line {
+  flex: 1;
+  height: 1px;
+  background: var(--border-subtle);
+}
+.scx-railhead-count {
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--text-quaternary);
+}
+.scx-railhead-count b {
+  color: var(--brand-strong);
+  font-weight: 700;
+}
+
+/* Each tab is a card with a left accent rail + circular progress. */
+.scx-tab {
+  position: relative;
+  isolation: isolate;
+  text-align: left;
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 15px 16px 15px 18px;
+  border-radius: 16px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: start;
+  gap: 14px;
+  transition: background var(--dur-base, 220ms) var(--ease-out),
+    border-color var(--dur-base, 220ms) var(--ease-out),
+    box-shadow var(--dur-base, 220ms) var(--ease-out),
+    transform var(--dur-base, 220ms) var(--ease-out);
+}
+.scx-tab::before {
+  /* left accent rail — grows in on active */
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 14px;
+  bottom: 14px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--brand);
+  transform: scaleY(0);
+  transform-origin: center;
+  opacity: 0;
+  transition: transform var(--dur-base, 220ms) var(--ease-out),
+    opacity var(--dur-base, 220ms) var(--ease-out);
+}
+.scx-tab:hover {
+  background: var(--bg-canvas);
+  border-color: var(--border-subtle);
+}
+.scx-tab:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+.scx-tab.on {
+  background: var(--bg-canvas);
+  border-color: var(--border-default);
+  box-shadow: var(--shadow-md);
+}
+.scx-tab.on::before {
+  transform: scaleY(1);
+  opacity: 1;
+}
+
+/* Index chip */
+.scx-chip {
+  width: 34px;
+  height: 34px;
+  border-radius: 11px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  background: var(--bg-muted);
+  color: var(--text-tertiary);
+  transition: background var(--dur-base, 220ms) var(--ease-out),
+    color var(--dur-base, 220ms) var(--ease-out),
+    box-shadow var(--dur-base, 220ms) var(--ease-out);
+}
+.scx-tab.on .scx-chip {
+  background: var(--brand);
+  color: var(--text-on-brand);
+  box-shadow: 0 4px 12px rgba(var(--brand-glow), 0.35);
+}
+
+.scx-body {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.scx-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 17px;
+  font-weight: 650;
+  color: var(--text-secondary);
+  letter-spacing: -0.01em;
+  transition: color var(--dur-base, 220ms) var(--ease-out);
+}
+.scx-tab.on .scx-title {
+  color: var(--text-primary);
+}
+.scx-num {
+  font-size: 12px;
+  color: var(--text-quaternary);
+  letter-spacing: 0.02em;
+}
+
+/* Expanding detail region */
+.scx-desc {
+  display: block;
+  overflow: hidden;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--text-secondary);
+}
+.scx-desc-body {
+  display: block;
+  padding-top: 7px;
+}
+.scx-bullets {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 13px;
+}
+.scx-bullet {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  color: var(--text-secondary);
+  font-size: 13.5px;
+  line-height: 19px;
+}
+.scx-bullet-tick {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  margin-top: 1px;
+  border-radius: 6px;
+  display: grid;
+  place-items: center;
+  background: var(--brand-soft);
+}
+
+/* Circular auto-advance progress (top-right of active tab) */
+.scx-ring {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  transform: rotate(-90deg);
+}
+.scx-ring-track {
+  fill: none;
+  stroke: var(--border-default);
+  stroke-width: 2.5;
+}
+.scx-ring-fill {
+  fill: none;
+  stroke: var(--brand);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-dasharray: 56.5;
+  stroke-dashoffset: 56.5;
+  animation: scxRing var(--scx-dur, 4.4s) linear forwards;
+}
+@keyframes scxRing {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+/* Static dot stand-in when reduced motion / not animating */
+.scx-ring-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--brand);
+  flex-shrink: 0;
+  margin-top: 7px;
+}
+
+.scx-cta {
+  margin-top: 14px;
+  padding: 0 4px;
+}
+
+/* ── Stage ────────────────────────────────────────────────── */
+.scx-stage {
+  position: relative;
+  min-height: 420px;
+  border-radius: 22px;
+  overflow: hidden;
+  background: var(--bg-canvas);
+  border: 1px solid var(--border-default);
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+}
+@media (max-width: 900px) {
+  .scx-stage {
+    min-height: 360px;
+  }
+}
+
+/* Soft branded ambience behind the mock */
+.scx-stage-glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(120% 90% at 20% 0%, rgba(var(--brand-glow), 0.14), transparent 55%),
+    radial-gradient(120% 90% at 100% 100%, rgba(var(--brand-glow), 0.08), transparent 60%);
+}
+.scx-stage-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  background-image:
+    linear-gradient(var(--border-subtle) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border-subtle) 1px, transparent 1px);
+  background-size: 34px 34px;
+  -webkit-mask-image: radial-gradient(120% 90% at 50% 35%, #000 0%, transparent 75%);
+  mask-image: radial-gradient(120% 90% at 50% 35%, #000 0%, transparent 75%);
+}
+
+/* Chrome header bar inside the stage */
+.scx-stage-bar {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border-subtle);
+  background: rgba(var(--brand-glow), 0.02);
+}
+.scx-stage-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  letter-spacing: -0.01em;
+}
+.scx-stage-tag {
+  margin-left: auto;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  padding: 3px 9px;
+  border-radius: 999px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-canvas);
+}
+
+/* Viewport that holds crossfading mocks */
+.scx-viewport {
+  position: relative;
+  flex: 1;
+  z-index: 1;
+}
+.scx-layer {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+}
+
+/* Dot indicators along the stage bottom */
+.scx-dots {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 0 16px;
+}
+.scx-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  background: var(--border-strong);
+  opacity: 0.6;
+  transition: width var(--dur-base, 220ms) var(--ease-out),
+    background var(--dur-base, 220ms) var(--ease-out),
+    opacity var(--dur-base, 220ms) var(--ease-out);
+}
+.scx-dot:hover {
+  opacity: 1;
+}
+.scx-dot.on {
+  width: 22px;
+  background: var(--brand);
+  opacity: 1;
+}

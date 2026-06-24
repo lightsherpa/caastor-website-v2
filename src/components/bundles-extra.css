@@ -1,39 +1,225 @@
 /* ──────────────────────────────────────────────────────────────────
    Caastor v2 — Bundles extras (co-located, owned by Bundles.jsx).
-   New class names only. Theme vars only. Adds: price anchor, use-case
-   block, and the muted "not included" (excludes) list separated from
-   the includes. Keeps the feature card highlighted via existing .bundle.
+   Premium comparison cards. New "bx-" class names only; theme vars only.
+   The feature card (.is-feature) is elevated: scaled up, dark fill, glow
+   halo, floating ribbon. Includes vs excludes are crisply split, the
+   price is the headline anchor.
    ────────────────────────────────────────────────────────────────── */
 
-/* "From" price anchor */
-.bx-price {
+/* ── Grid: three cards, the feature one allowed to bloom taller ── */
+.bx-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+  align-items: stretch;
+  margin-top: 8px;
+}
+
+/* ── Base card ── */
+.bx-card {
+  position: relative;
   display: flex;
-  align-items: baseline;
-  gap: 6px;
-  margin-bottom: 14px;
+  flex-direction: column;
+  padding: 30px 26px 28px;
+  border-radius: 22px;
+  background: var(--bg-canvas);
+  border: 1px solid var(--border-default);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  transition: transform 0.32s cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 0.32s cubic-bezier(0.2, 0.8, 0.2, 1),
+    border-color 0.32s ease;
 }
-.bx-price-from {
-  font-size: 12px;
-  font-weight: 600;
+.bx-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--border-strong);
+}
+.bx-card.no-motion,
+.bx-card.no-motion:hover {
+  transform: none;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+/* Top accent bar — per-bundle brand identity */
+.bx-accentbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  border-radius: 22px 22px 0 0;
+}
+
+/* ── Feature card: elevated, dark, magnetic ── */
+.bx-card.is-feature {
+  background: linear-gradient(180deg, var(--bg-inverse), #16130b);
+  border-color: rgba(var(--brand-glow), 0.5);
+  box-shadow: 0 24px 60px -20px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(var(--brand-glow), 0.18);
+  z-index: 1;
+}
+@media (min-width: 921px) {
+  .bx-card.is-feature {
+    transform: translateY(-12px) scale(1.035);
+    padding-top: 38px;
+  }
+  .bx-card.is-feature:hover {
+    transform: translateY(-18px) scale(1.035);
+  }
+  .bx-card.is-feature.no-motion,
+  .bx-card.is-feature.no-motion:hover {
+    transform: scale(1.02);
+  }
+}
+.bx-card.is-feature .bx-name,
+.bx-card.is-feature .bx-price-amount {
+  color: var(--text-on-brand, #fff);
+}
+.bx-card.is-feature .bx-for,
+.bx-card.is-feature .bx-desc {
+  color: rgba(255, 255, 255, 0.74);
+}
+.bx-card.is-feature .bx-price-from,
+.bx-card.is-feature .bx-price-cadence {
+  color: rgba(255, 255, 255, 0.55);
+}
+.bx-card.is-feature .bx-incl-row {
+  color: rgba(255, 255, 255, 0.92);
+}
+.bx-card.is-feature .bx-usecase {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+.bx-card.is-feature .bx-usecase-text {
+  color: rgba(255, 255, 255, 0.78);
+}
+.bx-card.is-feature .bx-usecase-lbl {
+  color: #fff;
+}
+.bx-card.is-feature .bx-list-label {
+  color: rgba(255, 255, 255, 0.5);
+}
+.bx-card.is-feature .bx-excludes {
+  border-top-color: rgba(255, 255, 255, 0.12);
+}
+.bx-card.is-feature .bx-excl-row {
+  color: rgba(255, 255, 255, 0.45);
+}
+.bx-card.is-feature .bx-excl-ic {
+  background: rgba(255, 255, 255, 0.07);
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* Warm glow halo behind the feature card */
+.bx-halo {
+  position: absolute;
+  inset: -40% -10% auto -10%;
+  height: 70%;
+  background: radial-gradient(60% 100% at 50% 0%, rgba(var(--brand-glow), 0.45), transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+.bx-card.is-feature > *:not(.bx-halo):not(.bx-accentbar) {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Floating "Most popular" ribbon ── */
+.bx-ribbon {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px 6px 10px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 800;
   letter-spacing: 0.02em;
-  text-transform: uppercase;
-  color: var(--text-tertiary);
+  color: var(--text-on-brand, #1a1606);
+  background: linear-gradient(135deg, var(--brand), var(--brand-strong));
+  box-shadow: 0 6px 16px -4px rgba(var(--brand-glow), 0.7);
+  z-index: 2;
 }
-.bx-price-amount {
-  font-size: 20px;
+
+/* ── Header block ── */
+.bx-top {
+  margin-bottom: 4px;
+}
+.bx-name-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.bx-name {
+  font-size: 21px;
   font-weight: 800;
   letter-spacing: -0.02em;
   color: var(--text-primary);
 }
+.bx-for {
+  font-size: 13.5px;
+  line-height: 19px;
+  color: var(--text-secondary);
+  margin-bottom: 18px;
+}
 
-/* Use-case callout — concrete audience + when to pick it */
+/* ── Price anchor — the headline number ── */
+.bx-price {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 6px;
+  padding-bottom: 18px;
+  margin-bottom: 18px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.bx-card.is-feature .bx-price {
+  border-bottom-color: rgba(255, 255, 255, 0.12);
+}
+.bx-price-from {
+  width: 100%;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin-bottom: 2px;
+}
+.bx-price-amount {
+  font-size: 34px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+}
+.bx-price-cadence {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+}
+.bx-desc {
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* ── CTA, pinned near the price ── */
+.bx-cta {
+  margin: 20px 0 4px;
+}
+
+/* ── Use-case rail ── */
 .bx-usecase {
   display: flex;
   gap: 10px;
   align-items: flex-start;
   padding: 12px 14px;
-  margin-bottom: 18px;
-  border-radius: 12px;
+  margin: 16px 0 4px;
+  border-radius: 13px;
   background: var(--bg-muted);
   border: 1px solid var(--border-default);
 }
@@ -42,50 +228,119 @@
   margin-top: 1px;
   color: var(--brand-strong);
 }
+.bx-card.is-feature .bx-usecase-ic {
+  color: var(--brand);
+}
 .bx-usecase-text {
-  font-size: 13.5px;
-  line-height: 20px;
+  font-size: 13px;
+  line-height: 19px;
   color: var(--text-secondary);
 }
+.bx-usecase-lbl {
+  color: var(--text-primary);
+  font-weight: 700;
+}
 
-/* Section labels above includes / excludes lists */
+/* ── List labels ── */
 .bx-list-label {
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.07em;
   color: var(--text-tertiary);
-  margin-bottom: 10px;
+  margin-bottom: 12px;
+}
+.bx-list-label-muted {
+  color: var(--text-quaternary);
 }
 
-/* Excludes block, clearly separated from the includes above it */
+/* ── Includes ── */
+.bx-list {
+  margin-top: 20px;
+}
+.bx-incl-list {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+.bx-incl-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  font-size: 14.5px;
+  line-height: 20px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+.bx-incl-ic {
+  flex-shrink: 0;
+  width: 21px;
+  height: 21px;
+  margin-top: 0;
+  border-radius: 999px;
+  background: rgba(var(--brand-glow), 0.16);
+  color: var(--brand-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.bx-card.is-feature .bx-incl-ic {
+  background: rgba(var(--brand-glow), 0.22);
+  color: var(--brand);
+}
+
+/* ── Excludes, clearly separated and dimmed ── */
 .bx-excludes {
-  margin-top: 18px;
-  padding-top: 18px;
+  margin-top: 22px;
+  padding-top: 20px;
   border-top: 1px solid var(--border-default);
-  margin-bottom: 22px;
 }
 .bx-excl-list {
   display: flex;
   flex-direction: column;
-  gap: 9px;
+  gap: 10px;
 }
 .bx-excl-row {
   display: flex;
-  align-items: center;
-  gap: 10px;
+  align-items: flex-start;
+  gap: 11px;
   font-size: 14px;
+  line-height: 20px;
   font-weight: 500;
   color: var(--text-tertiary);
 }
 .bx-excl-ic {
   flex-shrink: 0;
-  width: 20px;
-  height: 20px;
+  width: 21px;
+  height: 21px;
   border-radius: 999px;
   background: var(--bg-muted);
   color: var(--text-quaternary);
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* ── Footer link ── */
+.bx-foot {
+  text-align: center;
+  margin-top: 36px;
+}
+.bx-foot-link {
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* ── Responsive ── */
+@media (max-width: 920px) {
+  .bx-grid {
+    grid-template-columns: 1fr;
+    max-width: 480px;
+    margin-left: auto;
+    margin-right: auto;
+    gap: 20px;
+  }
+  .bx-card.is-feature {
+    transform: none;
+  }
 }

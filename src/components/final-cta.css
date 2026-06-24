@@ -1,0 +1,160 @@
+/* Final CTA band — bold branded closing moment.
+   Dark inverse base with a warm brand radial glow that drifts upward,
+   plus a slow ambient gradient sweep. All motion guarded in JS via
+   useReducedMotion + the .fcta--still modifier. */
+
+.fcta {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: var(--bg-inverse);
+  color: var(--text-inverse);
+}
+
+/* Hairline brand edge top + bottom for a framed, premium band feel. */
+.fcta::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg,
+      rgba(var(--brand-glow), 0.55) 0%,
+      rgba(var(--brand-glow), 0) 1.5px,
+      rgba(var(--brand-glow), 0) calc(100% - 1.5px),
+      rgba(var(--brand-glow), 0.35) 100%);
+}
+
+/* Soft vignette so the glow reads against the dark base. */
+.fcta::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(120% 80% at 50% 120%,
+    rgba(0, 0, 0, 0) 40%,
+    rgba(0, 0, 0, 0.35) 100%);
+}
+
+/* Glow layers ------------------------------------------------------ */
+.fcta__glow {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  z-index: 0;
+  width: 100%;
+  height: 70%;
+  pointer-events: none;
+  transform: translateY(1rem);
+  opacity: 0.85;
+  transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1), opacity 600ms ease;
+}
+
+/* On hover the whole band lifts the glow — the 21st "glow drifts up" idea. */
+.fcta:hover .fcta__glow {
+  transform: translateY(-1.25rem);
+  opacity: 1;
+}
+
+.fcta__glow-core,
+.fcta__glow-halo {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  filter: blur(2px);
+}
+
+.fcta__glow-halo {
+  width: 70%;
+  height: 420px;
+  background: radial-gradient(ellipse at center,
+    rgba(var(--brand-glow), 0.42) 0%,
+    rgba(var(--brand-glow), 0) 62%);
+}
+
+.fcta__glow-core {
+  width: 46%;
+  height: 300px;
+  background: radial-gradient(ellipse at center,
+    rgba(var(--brand-glow), 0.7) 0%,
+    rgba(var(--brand-glow), 0) 60%);
+}
+
+/* Slow ambient breathing on the core — disabled for reduced motion. */
+.fcta:not(.fcta--still) .fcta__glow-core {
+  animation: fcta-breathe 7s ease-in-out infinite;
+}
+
+@keyframes fcta-breathe {
+  0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.9; }
+  50%      { transform: translateX(-50%) scale(1.12); opacity: 1; }
+}
+
+/* Content ---------------------------------------------------------- */
+.fcta__inner {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+}
+
+.fcta__mascot {
+  width: 72px;
+  margin: 0 auto 22px;
+  display: block;
+  filter: drop-shadow(0 10px 28px rgba(var(--brand-glow), 0.35));
+}
+
+.fcta:not(.fcta--still) .fcta__mascot {
+  animation: fcta-float 5.5s ease-in-out infinite;
+}
+
+@keyframes fcta-float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-7px); }
+}
+
+.fcta__title {
+  color: var(--text-inverse);
+  margin: 0 auto 18px;
+  max-width: 17ch;
+}
+
+/* Warm gradient sheen on the headline for a premium finish. */
+.fcta__title .fcta__accent {
+  background: linear-gradient(100deg, var(--brand) 0%, var(--brand-strong) 55%, var(--brand) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.fcta__body {
+  font-size: 19px;
+  line-height: 30px;
+  color: color-mix(in srgb, var(--text-inverse) 74%, transparent);
+  max-width: 560px;
+  margin: 0 auto 32px;
+}
+
+.fcta__actions {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.fcta__secondary {
+  color: var(--text-inverse);
+  border-color: color-mix(in srgb, var(--text-inverse) 32%, transparent);
+  background: color-mix(in srgb, var(--text-inverse) 5%, transparent);
+  backdrop-filter: blur(4px);
+}
+
+@media (max-width: 600px) {
+  .fcta__glow-halo { height: 320px; }
+  .fcta__glow-core { height: 230px; }
+}

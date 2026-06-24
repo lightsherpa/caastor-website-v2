@@ -5,9 +5,17 @@ import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useReducedMotion, useInView } from "motion/react";
 import { Icon, Button } from "../ds/components.jsx";
 import { Reveal } from "./shell.jsx";
+import "./showcase-redesign.css";
 
 const EASE = [0.22, 0.61, 0.36, 1];
+const CYCLE_MS = 4400;
 const ICONS = ["star", "grid", "message", "layers"]; // brand, web, social, graphic
+
+/* Short bilingual stage-chrome labels per discipline (workspace vibe). */
+const STAGE_LABELS = {
+  en: ["Brand identity", "Web & product", "Social content", "Graphic design"],
+  es: ["Identidad de marca", "Web y producto", "Contenido social", "Diseño gráfico"],
+};
 
 /* Concrete deliverables per discipline, keyed to the four service items
    (brand, web, social, graphic). Bilingual; selected by t.code. Derived
@@ -136,59 +144,82 @@ export function Showcase({ t, navigate }) {
   const items = (t.services?.items || []).slice(0, 4);
   const es = t.code === "ES";
   const bullets = DELIVERABLES[es ? "es" : "en"];
+  const stageLabels = STAGE_LABELS[es ? "es" : "en"];
   const [active, setActive] = useState(0);
   const reduce = useReducedMotion();
   const stageRef = useRef(null);
   const inView = useInView(stageRef, { margin: "0px 0px -20% 0px" });
+  // Bump a key each (re)start so the ring/progress animation restarts cleanly,
+  // including when the user clicks a tab manually.
+  const [cycleKey, setCycleKey] = useState(0);
+  const running = !reduce && inView && items.length > 1;
 
   // Only auto-advance while the section is on screen, so transitions never
   // churn off-screen and leave the stage mid-fade (blank).
   useEffect(() => {
-    if (reduce || !inView || items.length < 2) return;
-    const id = setInterval(() => setActive((a) => (a + 1) % items.length), 4400);
+    if (!running) return;
+    const id = setInterval(() => {
+      setActive((a) => (a + 1) % items.length);
+      setCycleKey((k) => k + 1);
+    }, CYCLE_MS);
     return () => clearInterval(id);
-  }, [items.length, reduce, inView]);
+  }, [items.length, running]);
 
   if (!items.length) return null;
   const Mock = MOCKS[active] || MOCKS[0];
 
+  const jump = (i) => {
+    setActive(i);
+    setCycleKey((k) => k + 1); // restart the timer/ring on manual selection
+  };
+
   return (
-    <div className="showcase">
-      <div className="showcase-tabs">
+    <div className="scx">
+      {/* ── Tab rail ── */}
+      <div className="scx-rail">
+        <div className="scx-railhead">
+          <span className="scx-railhead-count t-mono">
+            <b>0{active + 1}</b> / 0{items.length}
+          </span>
+          <span className="scx-railhead-line" />
+        </div>
+
         {items.map((it, i) => {
           const on = i === active;
           return (
-            <button key={i} className={"showcase-tab" + (on ? " on" : "")} onClick={() => setActive(i)}>
-              <span className="showcase-num t-mono">0{i + 1}</span>
-              <span className="showcase-tab-body">
-                <span className="showcase-tab-title">
-                  <Icon name={ICONS[i]} size={17} /> {it.title}
+            <button
+              key={i}
+              type="button"
+              className={"scx-tab" + (on ? " on" : "")}
+              aria-pressed={on}
+              onClick={() => jump(i)}
+            >
+              <span className="scx-chip" aria-hidden="true">
+                <Icon name={ICONS[i]} size={17} />
+              </span>
+
+              <span className="scx-body">
+                <span className="scx-title">
+                  {it.title}
+                  <span className="scx-num t-mono">0{i + 1}</span>
                 </span>
+
                 <AnimatePresence initial={false}>
                   {on && (
                     <motion.span
-                      className="showcase-tab-desc"
+                      className="scx-desc"
                       initial={reduce ? false : { height: 0, opacity: 0 }}
                       animate={{ height: "auto", opacity: 1 }}
                       exit={reduce ? { opacity: 0 } : { height: 0, opacity: 0 }}
                       transition={{ duration: reduce ? 0 : 0.34, ease: EASE }}
                     >
-                      <span style={{ display: "block", paddingTop: 6 }}>{it.body}</span>
-                      <span
-                        className="sc-deliverables"
-                        style={{ display: "flex", flexDirection: "column", gap: 7, marginTop: 12 }}
-                      >
+                      <span className="scx-desc-body">{it.body}</span>
+                      <span className="scx-bullets">
                         {(bullets[i] || []).map((d, di) => (
-                          <span
-                            key={di}
-                            style={{ display: "flex", alignItems: "flex-start", gap: 8, color: "var(--text-secondary)" }}
-                          >
-                            <Icon
-                              name="check"
-                              size={15}
-                              color="var(--brand-strong)"
-                              style={{ flexShrink: 0, marginTop: 3 }}
-                            />
+                          <span key={di} className="scx-bullet">
+                            <span className="scx-bullet-tick" aria-hidden="true">
+                              <Icon name="check" size={12} color="var(--brand-strong)" />
+                            </span>
                             <span>{d}</span>
                           </span>
                         ))}
@@ -197,38 +228,91 @@ export function Showcase({ t, navigate }) {
                   )}
                 </AnimatePresence>
               </span>
-              {on && !reduce && <span key={active} className="showcase-progress" />}
+
+              {/* Auto-advance indicator: animated ring when cycling, dot otherwise */}
+              {on &&
+                (running ? (
+                  <svg
+                    key={cycleKey}
+                    className="scx-ring"
+                    viewBox="0 0 22 22"
+                    aria-hidden="true"
+                  >
+                    <circle className="scx-ring-track" cx="11" cy="11" r="9" />
+                    <circle
+                      className="scx-ring-fill"
+                      cx="11"
+                      cy="11"
+                      r="9"
+                      style={{ "--scx-dur": `${CYCLE_MS}ms` }}
+                    />
+                  </svg>
+                ) : (
+                  <span className="scx-ring-dot" aria-hidden="true" />
+                ))}
             </button>
           );
         })}
-        <div style={{ marginTop: 8 }}>
+
+        <div className="scx-cta">
           <Button variant="primary" size="md" iconEnd="arrowRight" onClick={() => navigate("services")}>
             {t.home.services.cta}
           </Button>
         </div>
       </div>
 
-      {/* H-7: drop the framed container — let the visual sit open/borderless.
-         Overrides .showcase-stage framing (can't edit motion.css). */}
-      <div
-        className="showcase-stage"
-        ref={stageRef}
-        style={{ background: "transparent", border: 0, borderRadius: 0, padding: 0, overflow: "visible" }}
-      >
+      {/* ── Stage ── */}
+      <div className="scx-stage" ref={stageRef}>
+        <span className="scx-stage-glow" aria-hidden="true" />
+        <span className="scx-stage-grid" aria-hidden="true" />
+
+        <div className="scx-stage-bar">
+          <span className="scx-stage-label">
+            <Icon name={ICONS[active]} size={15} color="var(--brand-strong)" />
+            <AnimatePresence initial={false} mode="wait">
+              <motion.span
+                key={active}
+                initial={reduce ? false : { opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={reduce ? { opacity: 0 } : { opacity: 0, y: -4 }}
+                transition={{ duration: reduce ? 0 : 0.24, ease: EASE }}
+              >
+                {stageLabels[active] || items[active]?.title}
+              </motion.span>
+            </AnimatePresence>
+          </span>
+          <span className="scx-stage-tag t-mono">{es ? "Vista previa" : "Preview"}</span>
+        </div>
+
         {/* initial={false} → first mock paints immediately (never blank);
            crossfade layers overlap so content stays visible mid-transition. */}
-        <AnimatePresence initial={false}>
-          <motion.div
-            key={active}
-            initial={{ opacity: 0, scale: 0.98 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 1 }}
-            transition={{ duration: 0.4, ease: EASE }}
-            style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", padding: 32 }}
-          >
-            <Mock />
-          </motion.div>
-        </AnimatePresence>
+        <div className="scx-viewport">
+          <AnimatePresence initial={false}>
+            <motion.div
+              key={active}
+              className="scx-layer"
+              initial={{ opacity: 0, scale: 0.97, y: reduce ? 0 : 8 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 1 }}
+              transition={{ duration: reduce ? 0 : 0.42, ease: EASE }}
+            >
+              <Mock />
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+        <div className="scx-dots">
+          {items.map((it, i) => (
+            <button
+              key={i}
+              type="button"
+              className={"scx-dot" + (i === active ? " on" : "")}
+              aria-label={it.title}
+              aria-pressed={i === active}
+              onClick={() => jump(i)}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );

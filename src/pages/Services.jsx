@@ -172,25 +172,44 @@ function GraphicVisual({ reduce }) {
 const VISUALS = [BrandVisual, WebVisual, SocialVisual, GraphicVisual];
 const ICON_TO_VISUAL = { star: BrandVisual, grid: WebVisual, message: SocialVisual, layers: GraphicVisual };
 
-function ServiceVisual({ index, icon, accent }) {
-  const reduce = useReducedMotion();
+function ServiceVisual({ index, icon, reduce }) {
   const Visual = VISUALS[index] || ICON_TO_VISUAL[icon] || BrandVisual;
-  return (
-    <div className={"svc-stage" + (accent ? " svc-stage--accent" : "")}>
-      <span className="svc-stage-glow" aria-hidden />
-      <Visual reduce={reduce} />
-    </div>
-  );
+  return <Visual reduce={reduce} />;
+}
+
+/* Split the one-sentence body into a problem (first sentence) and the
+   solution (the rest) without mutating the bound `it.body` data. Falls
+   back gracefully when there is no clean sentence break. */
+function splitBody(body) {
+  if (!body) return { problem: "", solution: "" };
+  const m = body.match(/^(.*?[.!?])\s+(.*)$/s);
+  if (m && m[2]) return { problem: m[1].trim(), solution: m[2].trim() };
+  return { problem: "", solution: body.trim() };
 }
 
 export function ServicesPage({ t, navigate }) {
   const s = t.services;
+  const reduce = useReducedMotion();
   // No `lang` prop is passed to this page, so detect it from `t` for any
   // NEW visible labels below (bilingual EN/ES, hyphen rule respected).
   const isEs = t.nav?.services === "Servicios";
   const banner = isEs
     ? { lead: "Mira los planes y elige tu ritmo.", cta: "Ver precios" }
     : { lead: "See the plans and pick your pace.", cta: "View pricing" };
+  const labels = isEs
+    ? { problem: "El problema", solution: "Lo que hacemos" }
+    : { problem: "The problem", solution: "What we do" };
+  const stats = isEs
+    ? [
+        { k: "24 a 48 h", l: "entrega" },
+        { k: "Diseñadores senior", l: "en cada proyecto" },
+        { k: "Una suscripción", l: "todo el diseño" },
+      ]
+    : [
+        { k: "24 to 48 h", l: "turnaround" },
+        { k: "Senior designers", l: "on every brief" },
+        { k: "One subscription", l: "all your design" },
+      ];
 
   return (
     <div className="page-enter">
@@ -206,7 +225,7 @@ export function ServicesPage({ t, navigate }) {
             </div>
           </Reveal>
           <Reveal delay={60}>
-            <h1 className="t-display-md balance" style={{ marginBottom: 18, maxWidth: 820, margin: "0 auto 18px" }}>
+            <h1 className="t-display-md balance" style={{ maxWidth: 820, margin: "0 auto 18px" }}>
               {s.h1}
             </h1>
           </Reveal>
@@ -215,44 +234,89 @@ export function ServicesPage({ t, navigate }) {
               {s.sub}
             </p>
           </Reveal>
+          <Reveal delay={180}>
+            <div className="svc-hero-stats">
+              {stats.map((st, i) => (
+                <span key={i} className="svc-stat">
+                  <span className="svc-stat-dot" aria-hidden />
+                  <span className="svc-stat-k">{st.k}</span>
+                  <span className="svc-stat-l">{st.l}</span>
+                </span>
+              ))}
+            </div>
+          </Reveal>
         </div>
       </section>
 
       <section className="section surface-canvas" style={{ paddingTop: 24 }}>
         <div className="container">
           <div className="grid grid-2">
-            {s.items.map((it, i) => (
-              <Reveal key={i} delay={(i % 2) * 90}>
-                <Card padded={32} hover style={{ height: "100%" }}>
-                  <div className="feature-card">
-                    {/* S-1 — animated, branded visual per discipline */}
-                    <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16 }}>
-                      <ServiceVisual index={i} icon={it.icon} accent={i % 2 === 1} />
-                      <span className="t-mono" style={{ fontSize: 13, color: "var(--text-quaternary)" }}>
-                        0{i + 1}
-                      </span>
+            {s.items.map((it, i) => {
+              const accent = i % 2 === 1;
+              const { problem, solution } = splitBody(it.body);
+              return (
+                <Reveal key={i} delay={(i % 2) * 90}>
+                  <Card padded={28} hover className={"svc-card" + (accent ? " svc-card--accent" : "")} style={{ height: "100%" }}>
+                    {/* S-1 — animated, branded visual per discipline in a
+                        full-width media panel with depth + hover sheen. */}
+                    <div className="svc-media">
+                      <span className="svc-media-grid" aria-hidden />
+                      <span className="svc-num">0{i + 1}</span>
+                      <ServiceVisual index={i} icon={it.icon} reduce={reduce} />
+                      <span className="svc-media-sheen" aria-hidden />
                     </div>
-                    <h3 className="t-h2" style={{ marginTop: 14, fontSize: 23 }}>
-                      {it.title}
-                    </h3>
-                    {/* S-2 — body rewritten problem→solution in content; render as-is */}
-                    <p className="pretty" style={{ fontSize: 16, lineHeight: "25px", color: "var(--text-secondary)" }}>
-                      {it.body}
-                    </p>
-                  </div>
-                </Card>
-              </Reveal>
-            ))}
+
+                    <span className="svc-tag">
+                      <span className="svc-tag-dot" aria-hidden />
+                      {it.tag || it.title}
+                    </span>
+
+                    <h3 className="t-h2 balance svc-title">{it.title}</h3>
+
+                    {/* S-2 — render the bound body as a problem → solution
+                        split; the full `it.body` data is the source. */}
+                    <div className="svc-body">
+                      {problem && (
+                        <div className="svc-line svc-line--problem">
+                          <span className="svc-line-mark svc-line-mark--problem" aria-hidden>
+                            ✕
+                          </span>
+                          <span className="svc-connector" aria-hidden />
+                          <p className="svc-line-text">
+                            <span className="t-mono" style={{ fontSize: 11, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--text-quaternary)", display: "block", marginBottom: 3 }}>
+                              {labels.problem}
+                            </span>
+                            {problem}
+                          </p>
+                        </div>
+                      )}
+                      <div className="svc-line svc-line--solution">
+                        <span className="svc-line-mark svc-line-mark--solution" aria-hidden>
+                          ✓
+                        </span>
+                        <p className="svc-line-text">
+                          <span className="t-mono" style={{ fontSize: 11, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--text-quaternary)", display: "block", marginBottom: 3 }}>
+                            {labels.solution}
+                          </span>
+                          {solution}
+                        </p>
+                      </div>
+                    </div>
+                  </Card>
+                </Reveal>
+              );
+            })}
           </div>
 
-          {/* S-3 — mid-page banner is now DISTINCT from the booking CTA:
+          {/* S-3 — mid-page banner is DISTINCT from the booking CTA:
               it routes to pricing instead of duplicating "book a demo". */}
           <Reveal delay={120}>
-            <div style={{ marginTop: 56, display: "flex", flexWrap: "wrap", gap: 16, alignItems: "center", justifyContent: "space-between", padding: "32px 36px", background: "var(--bg-app)", borderRadius: 18, border: "1px solid var(--border-default)" }}>
-              <p className="t-h3 balance" style={{ maxWidth: 560 }}>
+            <div className="svc-banner">
+              <span className="svc-banner-glow" aria-hidden />
+              <p className="t-h3 balance" style={{ maxWidth: 560, position: "relative" }}>
                 {banner.lead}
               </p>
-              <Button variant="outline" size="lg" iconEnd="arrowRight" onClick={() => navigate("pricing")}>
+              <Button variant="primary" size="lg" iconEnd="arrowRight" onClick={() => navigate("pricing")}>
                 {banner.cta}
               </Button>
             </div>
