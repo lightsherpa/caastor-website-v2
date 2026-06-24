@@ -70,3 +70,254 @@
     transition: none;
   }
 }
+
+/* ──────────────────────────────────────────────────────────────
+   Premium pricing table — plan cards
+   ────────────────────────────────────────────────────────────── */
+
+/* Plate behind the cards: soft dotted grid + a warm glow under the
+   popular column for depth. */
+.prc-plate {
+  position: relative;
+  isolation: isolate;
+}
+.prc-plate::before {
+  content: "";
+  position: absolute;
+  inset: -40px -8px 40px;
+  z-index: 0;
+  pointer-events: none;
+  background-image: radial-gradient(rgba(var(--brand-glow), 0.16) 0.9px, transparent 0.9px);
+  background-size: 16px 16px;
+  -webkit-mask-image: radial-gradient(120% 70% at 50% 22%, #000 0%, rgba(0, 0, 0, 0.35) 48%, transparent 78%);
+  mask-image: radial-gradient(120% 70% at 50% 22%, #000 0%, rgba(0, 0, 0, 0.35) 48%, transparent 78%);
+}
+
+.prc-grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+  align-items: stretch;
+}
+@media (max-width: 1080px) {
+  .prc-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+}
+@media (max-width: 560px) {
+  .prc-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Card shell */
+.prc-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border-radius: var(--radius-2xl);
+  background: var(--bg-canvas);
+  border: 1px solid var(--border-default);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--dur-base) var(--ease-spring),
+    box-shadow var(--dur-base) var(--ease-out),
+    border-color var(--dur-base) var(--ease-out);
+}
+.prc-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-md), 0 18px 44px rgba(var(--brand-glow), 0.12);
+}
+
+/* Popular column: lift, ring, and a tinted header */
+.prc-card.is-popular {
+  border-color: transparent;
+  background:
+    linear-gradient(var(--bg-canvas), var(--bg-canvas)) padding-box,
+    linear-gradient(180deg, var(--brand), rgba(var(--brand-glow), 0.25)) border-box;
+  box-shadow: var(--shadow-lg), 0 22px 54px rgba(var(--brand-glow), 0.22);
+  transform: translateY(-10px);
+}
+.prc-card.is-popular:hover {
+  transform: translateY(-14px);
+  box-shadow: var(--shadow-xl), 0 26px 60px rgba(var(--brand-glow), 0.28);
+}
+@media (max-width: 1080px) {
+  .prc-card.is-popular,
+  .prc-card.is-popular:hover {
+    transform: translateY(0);
+  }
+}
+
+/* Floating "Most popular" ribbon */
+.prc-ribbon {
+  position: absolute;
+  top: -13px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 13px;
+  border-radius: var(--radius-pill);
+  background: var(--brand);
+  color: var(--text-on-brand);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  box-shadow: var(--shadow-brand);
+}
+
+/* Header zone with a subtle top sheen */
+.prc-head {
+  position: relative;
+  padding: 26px 24px 22px;
+  border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
+  overflow: hidden;
+}
+.prc-card.is-popular .prc-head {
+  padding-top: 30px;
+}
+.prc-head::after {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 130px;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(var(--brand-glow), 0.10) 0%, rgba(var(--brand-glow), 0) 100%);
+}
+.prc-card.is-popular .prc-head::after {
+  background: linear-gradient(180deg, rgba(var(--brand-glow), 0.22) 0%, rgba(var(--brand-glow), 0) 100%);
+}
+
+.prc-sku-row {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 26px;
+}
+.prc-sku {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+}
+
+.prc-price-row {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-top: 16px;
+}
+.prc-amount {
+  display: inline-flex;
+  align-items: baseline;
+  font-weight: 800;
+  font-size: 44px;
+  line-height: 1;
+  letter-spacing: -0.035em;
+  color: var(--text-primary);
+}
+.prc-per {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-tertiary);
+}
+.prc-vat {
+  position: relative;
+  z-index: 1;
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--text-quaternary);
+}
+.prc-best {
+  position: relative;
+  z-index: 1;
+  margin-top: 12px;
+  font-size: 13.5px;
+  line-height: 20px;
+  color: var(--text-secondary);
+  min-height: 40px;
+}
+
+.prc-cta {
+  padding: 0 24px;
+}
+
+/* Feature list */
+.prc-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 20px 24px 26px;
+}
+.prc-incl {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-quaternary);
+}
+.prc-incl::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--border-subtle);
+}
+.prc-feats {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.prc-feat {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--text-primary);
+}
+.prc-feat-ck {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 21px;
+  height: 21px;
+  margin-top: 0;
+  border-radius: var(--radius-pill);
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+}
+.prc-card.is-popular .prc-feat-ck {
+  background: var(--brand);
+  color: var(--text-on-brand);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .prc-card,
+  .prc-card:hover,
+  .prc-card.is-popular,
+  .prc-card.is-popular:hover {
+    transition: none;
+    transform: none;
+  }
+}

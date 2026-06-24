@@ -1,7 +1,7 @@
 /* Caastor v2 — Pricing page */
 import { useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { Button, Card, Badge, Icon } from "../ds/components.jsx";
+import { Button, Badge, Icon } from "../ds/components.jsx";
 import { Reveal, Eyebrow, SectionHead } from "../components/shell.jsx";
 import { FinalCTA } from "../components/FinalCTA.jsx";
 import { FAQList } from "../components/Faq.jsx";
@@ -39,76 +39,88 @@ function BillingToggle({ p, yearly, setYearly }) {
   );
 }
 
-function PlanCard({ plan, p, navigate, yearly }) {
+function PlanCard({ plan, p, navigate, yearly, lang }) {
   const isPop = plan.popular;
   const reduce = useReducedMotion();
   const amount = yearly ? plan.priceYearly : plan.price;
   const per = yearly ? p.yearlyPer : p.per;
+  const inclLabel = lang === "es" ? "Incluido" : "What's included";
+
   return (
-    <Card padded={26} hover style={{ height: "100%", position: "relative" }} className={isPop ? "plan-popular-ring" : undefined}>
-      {isPop && <span className="plan-crown" />}
-      <div className="plan">
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", minHeight: 24 }}>
-          <span className="t-overline" style={{ color: "var(--text-secondary)", fontSize: 12 }}>
-            {plan.sku}
-          </span>
+    <article className={"prc-card" + (isPop ? " is-popular" : "")}>
+      {isPop && (
+        <span className="prc-ribbon">
+          <Icon name="sparkles" size={13} />
+          {p.popular}
+        </span>
+      )}
+
+      <div className="prc-head">
+        <div className="prc-sku-row">
+          <span className="prc-sku">{plan.sku}</span>
           {isPop && (
             <Badge tone="brand" dot>
               {p.popular}
             </Badge>
           )}
         </div>
-        <div>
-          <div className="plan-price" style={{ display: "flex", alignItems: "baseline" }}>
-            <span style={{ fontWeight: 800, fontSize: 40, letterSpacing: "-0.03em", display: "inline-flex", alignItems: "baseline" }}>
-              {p.currency === "$" ? "$" : ""}
-              <AnimatePresence mode="popLayout" initial={false}>
-                <motion.span
-                  key={amount}
-                  initial={reduce ? false : { y: 10, opacity: 0 }}
-                  animate={reduce ? {} : { y: 0, opacity: 1 }}
-                  exit={reduce ? {} : { y: -10, opacity: 0 }}
-                  transition={{ type: "spring", stiffness: 420, damping: 30 }}
-                  style={{ display: "inline-block" }}
-                >
-                  {amount}
-                </motion.span>
-              </AnimatePresence>
-              {p.currency === "€" ? " €" : ""}
-            </span>
-            <span style={{ fontSize: 15, color: "var(--text-tertiary)", marginLeft: 4 }}>{per}</span>
-          </div>
-          {p.vat && <div style={{ fontSize: 12, color: "var(--text-quaternary)", marginTop: 2 }}>{p.vat}</div>}
+
+        <div className="prc-price-row">
+          <span className="prc-amount">
+            {p.currency === "$" ? "$" : ""}
+            <AnimatePresence mode="popLayout" initial={false}>
+              <motion.span
+                key={amount}
+                initial={reduce ? false : { y: 10, opacity: 0 }}
+                animate={reduce ? {} : { y: 0, opacity: 1 }}
+                exit={reduce ? {} : { y: -10, opacity: 0 }}
+                transition={{ type: "spring", stiffness: 420, damping: 30 }}
+                style={{ display: "inline-block" }}
+              >
+                {amount}
+              </motion.span>
+            </AnimatePresence>
+            {p.currency === "€" ? " €" : ""}
+          </span>
+          <span className="prc-per">{per}</span>
         </div>
-        <p className="pretty" style={{ fontSize: 13.5, lineHeight: "20px", color: "var(--text-tertiary)", minHeight: 40 }}>
-          {plan.best}
-        </p>
+        {p.vat && <div className="prc-vat">{p.vat}</div>}
+
+        <p className="prc-best pretty">{plan.best}</p>
+      </div>
+
+      <div className="prc-cta">
         <Button
           variant={plan.variant}
-          size="md"
+          size="lg"
           full
           iconEnd={plan.variant === "primary" ? "arrowRight" : undefined}
           onClick={() => navigate("contact")}
         >
           {plan.cta}
         </Button>
-        <ul className="plan-features" style={{ marginTop: 4 }}>
+      </div>
+
+      <div className="prc-body">
+        <div className="prc-incl">{inclLabel}</div>
+        <ul className="prc-feats">
           {plan.features.map((f, i) => (
-            <li key={i} className="plan-feature">
-              <span className="ck">
-                <Icon name="check" size={16} />
+            <li key={i} className="prc-feat">
+              <span className="prc-feat-ck">
+                <Icon name="check" size={13} stroke={2.2} />
               </span>
               {f}
             </li>
           ))}
         </ul>
       </div>
-    </Card>
+    </article>
   );
 }
 
-export function PricingPage({ t, navigate }) {
+export function PricingPage({ t, navigate, lang }) {
   const p = t.pricing;
+  const resolvedLang = lang || (t.code === "ES" ? "es" : "en");
   const [yearly, setYearly] = useState(false);
   return (
     <div className="page-enter">
@@ -143,12 +155,14 @@ export function PricingPage({ t, navigate }) {
               <BillingToggle p={p} yearly={yearly} setYearly={setYearly} />
             </div>
           </Reveal>
-          <div className="plan-grid">
-            {p.plans.map((plan, i) => (
-              <Reveal key={i} delay={i * 70}>
-                <PlanCard plan={plan} p={p} navigate={navigate} yearly={yearly} />
-              </Reveal>
-            ))}
+          <div className="prc-plate">
+            <div className="prc-grid">
+              {p.plans.map((plan, i) => (
+                <Reveal key={i} delay={i * 70} style={{ height: "100%" }}>
+                  <PlanCard plan={plan} p={p} navigate={navigate} yearly={yearly} lang={resolvedLang} />
+                </Reveal>
+              ))}
+            </div>
           </div>
 
           <Reveal delay={80}>

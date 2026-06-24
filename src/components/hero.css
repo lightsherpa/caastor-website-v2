@@ -1,0 +1,251 @@
+/* ──────────────────────────────────────────────────────────────────
+   Caastor v2 — Hero elevation layer (HeroSection.jsx).
+   Co-located, unique class names (cst-hero-*) so nothing collides with
+   the shared sheets. The existing hero markup classes (.hero--dark,
+   .hero-stack, .hero-rotor, .browser-frame, .hero-float, .hero-cursor…)
+   still come from site.css / motion.css; this file only ADDS depth,
+   glow and ambient treatment on top of the brand shader background.
+   Everything heavy is guarded with prefers-reduced-motion.
+   ────────────────────────────────────────────────────────────────── */
+
+/* Ambient layers sit between the shader canvas (z 0) and content (z 1). */
+.cst-hero-ambient {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Faint perspective grid that fades at the edges (radial mask) — reads as
+   the product "canvas" without competing with the live shader field. */
+.cst-hero-grid {
+  position: absolute;
+  inset: -10% -10% 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+  background-size: 56px 56px;
+  -webkit-mask-image: radial-gradient(120% 78% at 50% 8%, #000 30%, transparent 72%);
+  mask-image: radial-gradient(120% 78% at 50% 8%, #000 30%, transparent 72%);
+  transform: perspective(900px) rotateX(46deg) translateY(8%) scale(1.4);
+  transform-origin: 50% 0;
+  opacity: 0.5;
+}
+
+/* Warm brand bloom high behind the headline — the "light source". */
+.cst-hero-halo {
+  position: absolute;
+  left: 50%;
+  top: -16%;
+  width: 92%;
+  max-width: 1180px;
+  height: 620px;
+  transform: translateX(-50%);
+  background:
+    radial-gradient(50% 50% at 50% 38%, rgba(var(--brand-glow), 0.5), transparent 68%),
+    radial-gradient(40% 40% at 50% 30%, rgba(var(--brand-glow), 0.28), transparent 72%);
+  filter: blur(6px);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .cst-hero-halo { animation: cstHaloBreathe 9s ease-in-out infinite; }
+}
+@keyframes cstHaloBreathe {
+  0%, 100% { opacity: 0.85; transform: translateX(-50%) scale(1); }
+  50% { opacity: 1; transform: translateX(-50%) scale(1.06); }
+}
+
+/* Two slow drifting accent orbs for depth in the lower corners. */
+.cst-hero-orb {
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(64px);
+  opacity: 0.5;
+}
+.cst-hero-orb.is-a {
+  width: 480px; height: 480px;
+  background: radial-gradient(circle, rgba(var(--brand-glow), 0.42), transparent 70%);
+  right: -120px; top: 10%;
+}
+.cst-hero-orb.is-b {
+  width: 420px; height: 420px;
+  background: radial-gradient(circle, rgba(var(--accent-glow), 0.34), transparent 70%);
+  left: -140px; bottom: -6%;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .cst-hero-orb.is-a { animation: cstOrbA 22s var(--ease-in-out, ease-in-out) infinite; }
+  .cst-hero-orb.is-b { animation: cstOrbB 26s var(--ease-in-out, ease-in-out) infinite; }
+}
+@keyframes cstOrbA { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(-44px, 34px); } }
+@keyframes cstOrbB { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(40px, -30px); } }
+
+/* Floating availability pill above the eyebrow — quiet "live" signal. */
+.cst-hero-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 6px 14px 6px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: rgba(255, 255, 255, 0.82);
+}
+.cst-hero-status-dot {
+  position: relative;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--status-success, #3dd68c);
+  flex-shrink: 0;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .cst-hero-status-dot::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 999px;
+    background: var(--status-success, #3dd68c);
+    animation: cstPing 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+  }
+}
+@keyframes cstPing {
+  0% { transform: scale(1); opacity: 0.7; }
+  70%, 100% { transform: scale(2.6); opacity: 0; }
+}
+
+/* Headline gets a top-light gradient fade (white → soft) for premium depth.
+   Kept high-contrast so the serif brand accent and the LCP sub stay crisp;
+   the serif accent override below restores full brand color. */
+.cst-hero-h1 {
+  background: linear-gradient(180deg, #ffffff 0%, #ffffff 52%, rgba(255, 255, 255, 0.74) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+.cst-hero-h1 span {
+  background: inherit;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+.cst-hero-h1 .serif-accent {
+  background: none;
+  -webkit-text-fill-color: var(--brand);
+  color: var(--brand);
+}
+
+/* Trust strip under the CTAs — small, on-dark, no entrance dependency. */
+.cst-hero-trust {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 22px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.62);
+}
+.cst-hero-trust-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+}
+.cst-hero-trust-item svg { color: var(--brand); flex-shrink: 0; }
+.cst-hero-trust-sep {
+  width: 1px;
+  height: 14px;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+/* Stage frame: a soft brand under-glow pooled beneath the product so the
+   tilted dashboard feels like it floats and emits warmth. */
+.cst-hero-stage-wrap {
+  position: relative;
+}
+.cst-hero-stage-glow {
+  position: absolute;
+  left: 50%;
+  bottom: -7%;
+  width: 84%;
+  height: 56%;
+  transform: translateX(-50%);
+  background: radial-gradient(50% 60% at 50% 50%, rgba(var(--brand-glow), 0.4), transparent 72%);
+  filter: blur(36px);
+  z-index: 0;
+  pointer-events: none;
+}
+.cst-hero-stage-inner {
+  position: relative;
+  z-index: 1;
+}
+
+/* Reflection sheen sweeping across the browser frame on the product. */
+.cst-hero-sheen {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border-radius: 14px;
+  pointer-events: none;
+  overflow: hidden;
+}
+.cst-hero-sheen::before {
+  content: "";
+  position: absolute;
+  top: -60%;
+  left: -30%;
+  width: 50%;
+  height: 220%;
+  background: linear-gradient(105deg, transparent, rgba(255, 255, 255, 0.12), transparent);
+  transform: rotate(8deg) translateX(-120%);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .cst-hero-sheen::before { animation: cstSheen 7.5s ease-in-out 1.4s infinite; }
+}
+@keyframes cstSheen {
+  0% { transform: rotate(8deg) translateX(-120%); }
+  18%, 100% { transform: rotate(8deg) translateX(520%); }
+}
+
+/* Third floating chip: a live counter-style metric on the right edge. */
+.cst-hero-metric {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 11px 15px;
+}
+.cst-hero-metric-spark {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 22px;
+}
+.cst-hero-metric-spark i {
+  width: 4px;
+  border-radius: 2px;
+  background: var(--brand);
+  display: block;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .cst-hero-metric-spark i { animation: cstBar 1.6s ease-in-out infinite; }
+  .cst-hero-metric-spark i:nth-child(2) { animation-delay: 0.2s; }
+  .cst-hero-metric-spark i:nth-child(3) { animation-delay: 0.4s; }
+  .cst-hero-metric-spark i:nth-child(4) { animation-delay: 0.6s; }
+}
+@keyframes cstBar {
+  0%, 100% { height: 35%; opacity: 0.55; }
+  50% { height: 100%; opacity: 1; }
+}
+
+@media (max-width: 760px) {
+  .cst-hero-grid { display: none; }
+  .cst-hero-trust { gap: 12px; flex-wrap: wrap; }
+  .cst-hero-orb { opacity: 0.4; }
+}
+@media (max-width: 560px) {
+  .cst-hero-metric { display: none; }
+  .cst-hero-trust-sep { display: none; }
+}
