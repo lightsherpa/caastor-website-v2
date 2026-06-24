@@ -137,19 +137,28 @@ export function PlansEditor({ pricing, onChange }) {
     onChange({ ...pricing, plans: next });
   };
   const setMeta = (patch) => onChange({ ...pricing, ...patch });
+  const billing = pricing.billing || {};
+  const setBilling = (patch) => onChange({ ...pricing, billing: { ...billing, ...patch } });
 
   return (
     <div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12, marginBottom: 18 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12, marginBottom: 12 }}>
         <Text label="Currency symbol" value={pricing.currency} onChange={(v) => setMeta({ currency: v })} />
-        <Text label="Per (e.g. /mo)" value={pricing.per} onChange={(v) => setMeta({ per: v })} />
-        <Text label='Popular label' value={pricing.popular} onChange={(v) => setMeta({ popular: v })} />
+        <Text label="Per, monthly (e.g. /mo)" value={pricing.per} onChange={(v) => setMeta({ per: v })} />
+        <Text label="Per, yearly (e.g. /yr)" value={pricing.yearlyPer} onChange={(v) => setMeta({ yearlyPer: v })} />
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 12, marginBottom: 18 }}>
+        <Text label="Popular label" value={pricing.popular} onChange={(v) => setMeta({ popular: v })} />
+        <Text label="Monthly toggle label" value={billing.monthlyLabel} onChange={(v) => setBilling({ monthlyLabel: v })} />
+        <Text label="Yearly toggle label" value={billing.yearlyLabel} onChange={(v) => setBilling({ yearlyLabel: v })} />
+        <Text label="Yearly save badge" value={billing.saveLabel} onChange={(v) => setBilling({ saveLabel: v })} />
       </div>
       {plans.map((p, i) => (
         <div className="tree-item" key={i} style={{ marginBottom: 14 }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
             <Text label="Plan name (SKU)" value={p.sku} onChange={(v) => setPlan(i, { sku: v })} />
-            <Text label="Price" value={p.price} onChange={(v) => setPlan(i, { price: v })} />
+            <Text label="Price (monthly)" value={p.price} onChange={(v) => setPlan(i, { price: v })} />
+            <Text label="Price (yearly)" value={p.priceYearly} onChange={(v) => setPlan(i, { priceYearly: v })} />
           </div>
           <Text label="Best for" value={p.best} multiline onChange={(v) => setPlan(i, { best: v })} />
           <Text label="CTA label" value={p.cta} onChange={(v) => setPlan(i, { cta: v })} />

@@ -286,10 +286,18 @@ export function Footer({ t, navigate }) {
                   className="ftr-input"
                   type="email"
                   placeholder={t.footer.emailPh}
+                  aria-label={t.footer.emailPh}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
-                <Button variant="primary" size="md" iconEnd="arrowRight" onClick={submit}>
+                <Button
+                  variant="primary"
+                  size="md"
+                  iconEnd="arrowRight"
+                  type="submit"
+                  aria-label={t.footer.newsletterCta}
+                  onClick={submit}
+                >
                   {t.footer.newsletterCta}
                 </Button>
               </form>

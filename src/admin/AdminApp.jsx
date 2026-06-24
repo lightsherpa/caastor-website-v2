@@ -35,37 +35,80 @@ function SetupPanel({ navigate }) {
 function Login() {
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
   const [err, setErr] = useState("");
 
   const send = async (e) => {
     e?.preventDefault();
     setErr("");
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: { emailRedirectTo: window.location.origin + "/admin" },
-    });
-    if (error) setErr(error.message);
-    else setSent(true);
+    const trimmed = email.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+      setErr("Enter a valid email address.");
+      return;
+    }
+    setSending(true);
+    try {
+      const { error } = await supabase.auth.signInWithOtp({
+        email: trimmed,
+        options: { emailRedirectTo: window.location.origin + "/admin" },
+      });
+      if (error) setErr(error.message || "Couldn’t send the link. Please try again.");
+      else setSent(true);
+    } catch (e2) {
+      setErr(e2?.message || "Network error — check your connection and try again.");
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
     <div className="admin-center">
       <div className="admin-login">
         <img src="/assets/logo-full-yellow.png" alt="Caastor" style={{ height: 28, marginBottom: 20 }} />
-        <h1 className="admin-h">Admin sign in</h1>
-        <p className="admin-sub">We’ll email you a magic link — no password.</p>
         {sent ? (
-          <div style={{ display: "flex", alignItems: "center", gap: 10, color: "var(--status-success)", fontWeight: 600 }}>
-            <Icon name="check" size={18} /> Check {email} for your link.
-          </div>
-        ) : (
-          <form onSubmit={send}>
-            <Text label="Email" value={email} onChange={setEmail} placeholder="you@caastor.co" />
-            {err && <p style={{ color: "var(--status-danger)", fontSize: 13, margin: "0 0 12px" }}>{err}</p>}
-            <Button variant="primary" size="lg" full iconEnd="arrowRight" onClick={send}>
-              Send magic link
+          <>
+            <h1 className="admin-h">Check your inbox</h1>
+            <div className="admin-note admin-note--ok">
+              <Icon name="check" size={18} />
+              <span>
+                We emailed a magic link to <strong>{email.trim()}</strong>. Open it on this device to finish signing in.
+              </span>
+            </div>
+            <p className="admin-sub" style={{ margin: "16px 0 14px" }}>
+              The link expires after a short while and can only be used once. Don’t see it? Check spam, then resend.
+            </p>
+            <Button
+              variant="outline"
+              size="md"
+              full
+              onClick={() => {
+                setSent(false);
+                setErr("");
+              }}
+            >
+              Use a different email or resend
             </Button>
-          </form>
+          </>
+        ) : (
+          <>
+            <h1 className="admin-h">Admin sign in</h1>
+            <p className="admin-sub">We’ll email you a magic link — no password.</p>
+            <form onSubmit={send} noValidate>
+              <Text label="Email" value={email} onChange={setEmail} placeholder="you@caastor.co" />
+              {err && (
+                <p className="admin-error" role="alert">
+                  <Icon name="flag" size={15} /> {err}
+                </p>
+              )}
+              <Button variant="primary" size="lg" full iconEnd="arrowRight" onClick={send} disabled={sending}>
+                {sending ? "Sending…" : "Send magic link"}
+              </Button>
+            </form>
+            <p className="admin-hint">
+              Link doesn’t arrive or lands on an error page? The current domain ({window.location.origin}) must be listed in your
+              Supabase project under <strong>Authentication → URL Configuration</strong> (both the Site URL and the Redirect URLs).
+            </p>
+          </>
         )}
       </div>
     </div>
@@ -211,11 +254,15 @@ function Dashboard({ session, navigate, theme, toggleTheme }) {
 /* ── Orchestrator ─────────────────────────────────────────────── */
 export function AdminApp({ navigate, theme, toggleTheme }) {
   const [session, setSession] = useState(undefined); // undefined = loading
-  const [isAdmin, setIsAdmin] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(null); // null = unchecked, true/false = result
+  const [gateError, setGateError] = useState("");
 
   useEffect(() => {
     if (!isSupabaseConfigured) return;
-    supabase.auth.getSession().then(({ data }) => setSession(data.session || null));
+    supabase.auth
+      .getSession()
+      .then(({ data }) => setSession(data.session || null))
+      .catch(() => setSession(null));
     const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => setSession(s || null));
     return () => sub.subscription.unsubscribe();
   }, []);
@@ -223,32 +270,73 @@ export function AdminApp({ navigate, theme, toggleTheme }) {
   useEffect(() => {
     if (!session) {
       setIsAdmin(null);
+      setGateError("");
       return;
     }
+    let cancelled = false;
+    setIsAdmin(null);
+    setGateError("");
     supabase
       .from("admins")
       .select("email")
       .eq("email", session.user.email)
       .maybeSingle()
-      .then(({ data }) => setIsAdmin(!!data));
+      .then(({ data, error }) => {
+        if (cancelled) return;
+        // A missing row is not an error (maybeSingle → data null). A real
+        // error (network / RLS) shouldn't masquerade as "not an admin".
+        if (error) setGateError(error.message || "Couldn’t verify access.");
+        setIsAdmin(!!data);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [session]);
 
   if (!isSupabaseConfigured) return <SetupPanel navigate={navigate} />;
-  if (session === undefined) return <div className="admin-center">Loading…</div>;
+  if (session === undefined) return <AdminLoading label="Loading admin…" />;
   if (!session) return <Login />;
-  if (isAdmin === null) return <div className="admin-center">Checking access…</div>;
+  if (isAdmin === null) return <AdminLoading label="Verifying your access…" />;
   if (!isAdmin) {
     return (
       <div className="admin-center">
         <div className="admin-login" style={{ textAlign: "center" }}>
-          <h1 className="admin-h">Not authorized</h1>
-          <p className="admin-sub">{session.user.email} isn’t an admin. Add it to the `admins` table in Supabase.</p>
-          <Button variant="soft" size="md" onClick={() => supabase.auth.signOut()}>
-            Sign out
-          </Button>
+          <img src="/assets/logo-full-yellow.png" alt="Caastor" style={{ height: 28, margin: "0 auto 20px" }} />
+          <h1 className="admin-h">{gateError ? "Couldn’t verify access" : "This account isn’t an admin"}</h1>
+          {gateError ? (
+            <p className="admin-sub">
+              We reached Supabase but the access check failed: <strong>{gateError}</strong>. This is usually a Row Level
+              Security policy on the <code>admins</code> table. Try again, or sign out and use a different account.
+            </p>
+          ) : (
+            <p className="admin-sub">
+              You’re signed in as <strong>{session.user.email}</strong>, but it isn’t on the admin list. Add this exact
+              email to the <code>admins</code> table in Supabase, then sign out and back in.
+            </p>
+          )}
+          <div className="admin-actions">
+            <Button variant="soft" size="md" full onClick={() => supabase.auth.signOut()}>
+              Sign out
+            </Button>
+            <Button variant="ghost" size="md" full onClick={() => navigate("home")}>
+              ← Back to site
+            </Button>
+          </div>
         </div>
       </div>
     );
   }
   return <Dashboard session={session} navigate={navigate} theme={theme} toggleTheme={toggleTheme} />;
+}
+
+/* ── Loading splash ───────────────────────────────────────────── */
+function AdminLoading({ label }) {
+  return (
+    <div className="admin-center">
+      <div className="admin-loading">
+        <span className="admin-spinner" aria-hidden />
+        <span>{label}</span>
+      </div>
+    </div>
+  );
 }

@@ -7,33 +7,68 @@ import { FinalCTA } from "../components/FinalCTA.jsx";
 import { FAQList } from "../components/Faq.jsx";
 import "./pricing-extra.css";
 
-function BillingToggle({ p, yearly, setYearly }) {
+function BillingToggle({ p, yearly, setYearly, liveNote }) {
   const b = p.billing;
+  // Roving-tabindex radiogroup: the two options behave as radios so AT
+  // announces "radio button, 1 of 2 / 2 of 2" and the price-change note.
+  const onKeyDown = (e) => {
+    switch (e.key) {
+      case "ArrowLeft":
+      case "ArrowUp":
+        e.preventDefault();
+        setYearly(false);
+        break;
+      case "ArrowRight":
+      case "ArrowDown":
+        e.preventDefault();
+        setYearly(true);
+        break;
+      case "Home":
+        e.preventDefault();
+        setYearly(false);
+        break;
+      case "End":
+        e.preventDefault();
+        setYearly(true);
+        break;
+      default:
+        break;
+    }
+  };
+  const opt = (isYearly, label) => {
+    const selected = yearly === isYearly;
+    return (
+      <button
+        type="button"
+        role="radio"
+        aria-checked={selected}
+        tabIndex={selected ? 0 : -1}
+        className={"pr-seg-btn" + (selected ? " is-active" : "")}
+        onClick={() => setYearly(isYearly)}
+        onKeyDown={onKeyDown}
+      >
+        {label}
+      </button>
+    );
+  };
   return (
     <div className="pr-billing">
-      <div className="pr-seg" role="group" aria-label={b.monthlyLabel + " / " + b.yearlyLabel}>
+      <div
+        className="pr-seg"
+        role="radiogroup"
+        aria-label={b.monthlyLabel + " / " + b.yearlyLabel}
+      >
         <span className={"pr-seg-thumb" + (yearly ? " is-yearly" : "")} aria-hidden />
-        <button
-          type="button"
-          className={"pr-seg-btn" + (!yearly ? " is-active" : "")}
-          aria-pressed={!yearly}
-          onClick={() => setYearly(false)}
-        >
-          {b.monthlyLabel}
-        </button>
-        <button
-          type="button"
-          className={"pr-seg-btn" + (yearly ? " is-active" : "")}
-          aria-pressed={yearly}
-          onClick={() => setYearly(true)}
-        >
-          {b.yearlyLabel}
-        </button>
+        {opt(false, b.monthlyLabel)}
+        {opt(true, b.yearlyLabel)}
       </div>
       <span className="pr-save">
         <Badge tone="success" dot>
           {b.saveLabel}
         </Badge>
+      </span>
+      <span className="pr-live" role="status" aria-live="polite">
+        {liveNote}
       </span>
     </div>
   );
@@ -122,6 +157,11 @@ export function PricingPage({ t, navigate, lang }) {
   const p = t.pricing;
   const resolvedLang = lang || (t.code === "ES" ? "es" : "en");
   const [yearly, setYearly] = useState(false);
+  // Spoken note for the aria-live region so screen readers hear the
+  // billing period + matching unit price change, not just a toggle flip.
+  const b = p.billing;
+  const liveNote =
+    (yearly ? b.yearlyLabel : b.monthlyLabel) + " · " + (yearly ? p.yearlyPer : p.per);
   return (
     <div className="page-enter">
       <section className="hero surface-canvas">
@@ -152,7 +192,7 @@ export function PricingPage({ t, navigate, lang }) {
         <div className="container">
           <Reveal>
             <div style={{ display: "flex", justifyContent: "center", marginBottom: 32 }}>
-              <BillingToggle p={p} yearly={yearly} setYearly={setYearly} />
+              <BillingToggle p={p} yearly={yearly} setYearly={setYearly} liveNote={liveNote} />
             </div>
           </Reveal>
           <div className="prc-plate">

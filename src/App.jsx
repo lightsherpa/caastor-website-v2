@@ -7,18 +7,80 @@ import { GsapEffects } from "./motion/GsapEffects.jsx";
 import { parseLocation, pathForTarget } from "./router.js";
 import { useSiteContent } from "./content/useSiteContent.js";
 import { useCalInit } from "./lib/booking.js";
+// Home stays eager — it's the landing route and drives LCP.
 import { HomePage } from "./pages/Home.jsx";
-import { ServicesPage } from "./pages/Services.jsx";
-import { PricingPage } from "./pages/Pricing.jsx";
-import { AboutPage } from "./pages/About.jsx";
-import { ContactPage } from "./pages/Contact.jsx";
-import { FaqPage } from "./pages/Faq.jsx";
-import { NotFoundPage } from "./pages/NotFound.jsx";
 
-// Code-split: the admin (CMS) and blog (markdown deps) load on demand only.
+// Code-split: every non-home page loads on demand so the Home route ships lighter.
+// The admin (CMS) and blog (markdown deps) were already split; the rest follow now.
+const ServicesPage = lazy(() => import("./pages/Services.jsx").then((m) => ({ default: m.ServicesPage })));
+const PricingPage = lazy(() => import("./pages/Pricing.jsx").then((m) => ({ default: m.PricingPage })));
+const AboutPage = lazy(() => import("./pages/About.jsx").then((m) => ({ default: m.AboutPage })));
+const ContactPage = lazy(() => import("./pages/Contact.jsx").then((m) => ({ default: m.ContactPage })));
+const FaqPage = lazy(() => import("./pages/Faq.jsx").then((m) => ({ default: m.FaqPage })));
+const NotFoundPage = lazy(() => import("./pages/NotFound.jsx").then((m) => ({ default: m.NotFoundPage })));
 const BlogIndexPage = lazy(() => import("./pages/Blog.jsx").then((m) => ({ default: m.BlogIndexPage })));
 const BlogPostPage = lazy(() => import("./pages/BlogPost.jsx").then((m) => ({ default: m.BlogPostPage })));
 const AdminApp = lazy(() => import("./admin/AdminApp.jsx").then((m) => ({ default: m.AdminApp })));
+
+// Per-route document titles + meta descriptions (bilingual). Keyed by route.
+const PAGE_META = {
+  home: {
+    en: { title: "Caastor · Growth systems for modern teams", desc: "Caastor builds growth systems, automation, and AI workflows for modern teams." },
+    es: { title: "Caastor · Sistemas de crecimiento para equipos modernos", desc: "Caastor crea sistemas de crecimiento, automatización y flujos de IA para equipos modernos." },
+  },
+  services: {
+    en: { title: "Services · Caastor", desc: "Explore Caastor's services and how we help your team grow." },
+    es: { title: "Servicios · Caastor", desc: "Explora los servicios de Caastor y cómo ayudamos a tu equipo a crecer." },
+  },
+  pricing: {
+    en: { title: "Pricing · Caastor", desc: "Simple, transparent pricing for Caastor's growth systems." },
+    es: { title: "Precios · Caastor", desc: "Precios simples y transparentes para los sistemas de crecimiento de Caastor." },
+  },
+  about: {
+    en: { title: "About · Caastor", desc: "Learn about Caastor — who we are and how we work." },
+    es: { title: "Nosotros · Caastor", desc: "Conoce a Caastor — quiénes somos y cómo trabajamos." },
+  },
+  contact: {
+    en: { title: "Contact · Caastor", desc: "Get in touch with the Caastor team." },
+    es: { title: "Contacto · Caastor", desc: "Ponte en contacto con el equipo de Caastor." },
+  },
+  faq: {
+    en: { title: "FAQ · Caastor", desc: "Answers to common questions about Caastor." },
+    es: { title: "Preguntas frecuentes · Caastor", desc: "Respuestas a las preguntas frecuentes sobre Caastor." },
+  },
+  blog: {
+    en: { title: "Blog · Caastor", desc: "Insights and updates from the Caastor team." },
+    es: { title: "Blog · Caastor", desc: "Ideas y novedades del equipo de Caastor." },
+  },
+  blogpost: {
+    en: { title: "Blog · Caastor", desc: "Insights and updates from the Caastor team." },
+    es: { title: "Blog · Caastor", desc: "Ideas y novedades del equipo de Caastor." },
+  },
+  admin: {
+    en: { title: "Admin · Caastor", desc: "" },
+    es: { title: "Admin · Caastor", desc: "" },
+  },
+  notfound: {
+    en: { title: "Page not found · Caastor", desc: "The page you're looking for doesn't exist." },
+    es: { title: "Página no encontrada · Caastor", desc: "La página que buscas no existe." },
+  },
+};
+
+// Apply the document <title> and meta description for the active route + language.
+function applyPageMeta(route, lang) {
+  const byRoute = PAGE_META[route] || PAGE_META.notfound;
+  const meta = byRoute[lang] || byRoute.en;
+  document.title = meta.title;
+  if (typeof meta.desc === "string") {
+    let tag = document.querySelector('meta[name="description"]');
+    if (!tag) {
+      tag = document.createElement("meta");
+      tag.setAttribute("name", "description");
+      document.head.appendChild(tag);
+    }
+    tag.setAttribute("content", meta.desc);
+  }
+}
 
 export default function App() {
   const [lang, setLang] = useState(() => localStorage.getItem("caastor_lang") || "en");
@@ -45,6 +107,11 @@ export default function App() {
     window.addEventListener("popstate", onPop);
     return () => window.removeEventListener("popstate", onPop);
   }, []);
+
+  // Per-route document title + meta description (bilingual).
+  useEffect(() => {
+    applyPageMeta(loc.route, lang);
+  }, [loc.route, lang]);
 
   const navigate = (target) => {
     const path = pathForTarget(target);

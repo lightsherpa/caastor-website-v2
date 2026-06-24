@@ -65,29 +65,38 @@ function BlockFields({ block, set }) {
               <UploadButton folder="blog" onDone={(url) => set({ url })} />
             </div>
           </div>
+          {block.url ? (
+            <img src={block.url} alt={block.alt || ""} style={{ maxWidth: "100%", maxHeight: 160, borderRadius: 8, border: "1px solid var(--border-default)", display: "block", marginBottom: 8 }} />
+          ) : null}
           <Text label="Alt text" value={block.alt} onChange={(v) => set({ alt: v })} />
           <Text label="Caption" value={block.caption} onChange={(v) => set({ caption: v })} />
         </>
       );
-    case "gallery":
+    case "gallery": {
+      const images = block.images || [];
+      const setImg = (i, patch) => set({ images: images.map((x, idx) => (idx === i ? { ...x, ...patch } : x)) });
       return (
         <Field label="Images">
-          {(block.images || []).map((im, i) => (
-            <div key={i} style={{ display: "flex", gap: 6, marginBottom: 6 }}>
-              <input style={{ flex: 1 }} value={im.url} placeholder="Image URL" onChange={(e) => set({ images: block.images.map((x, idx) => (idx === i ? { ...x, url: e.target.value } : x)) })} />
-              <Button variant="soft" size="sm" onClick={() => set({ images: block.images.filter((_, idx) => idx !== i) })}>
+          {images.length === 0 && <p style={{ color: "var(--text-tertiary)", fontSize: 13, margin: "0 0 8px" }}>No images yet. Add a URL or upload one.</p>}
+          {images.map((im, i) => (
+            <div key={i} style={{ display: "flex", gap: 6, marginBottom: 6, alignItems: "center" }}>
+              {im.url ? <img src={im.url} alt="" style={{ width: 40, height: 40, objectFit: "cover", borderRadius: 6, border: "1px solid var(--border-default)", flexShrink: 0 }} /> : null}
+              <input style={{ flex: 2 }} value={im.url ?? ""} placeholder="Image URL" onChange={(e) => setImg(i, { url: e.target.value })} />
+              <input style={{ flex: 1 }} value={im.alt ?? ""} placeholder="Alt text" onChange={(e) => setImg(i, { alt: e.target.value })} />
+              <Button variant="soft" size="sm" onClick={() => set({ images: images.filter((_, idx) => idx !== i) })}>
                 ✕
               </Button>
             </div>
           ))}
           <div style={{ display: "flex", gap: 8 }}>
-            <Button variant="soft" size="sm" icon="plus" onClick={() => set({ images: [...(block.images || []), { url: "", alt: "" }] })}>
+            <Button variant="soft" size="sm" icon="plus" onClick={() => set({ images: [...images, { url: "", alt: "" }] })}>
               Add URL
             </Button>
-            <UploadButton folder="blog" label="Upload image" onDone={(url) => set({ images: [...(block.images || []), { url, alt: "" }] })} />
+            <UploadButton folder="blog" label="Upload image" onDone={(url) => set({ images: [...images, { url, alt: "" }] })} />
           </div>
         </Field>
       );
+    }
     case "quote":
       return (
         <>
@@ -98,7 +107,7 @@ function BlockFields({ block, set }) {
     case "callout":
       return (
         <>
-          <Select label="Tone" value={block.tone} options={["brand", "info", "success", "warning"]} onChange={(v) => set({ tone: v })} />
+          <Select label="Tone" value={block.tone || "brand"} options={[{ value: "brand", label: "Brand" }, { value: "info", label: "Info" }, { value: "success", label: "Success" }, { value: "warning", label: "Warning" }]} onChange={(v) => set({ tone: v })} />
           <Text label="Title" value={block.title} onChange={(v) => set({ title: v })} />
           <Text label="Body" value={block.body} multiline onChange={(v) => set({ body: v })} />
         </>
@@ -119,7 +128,12 @@ function BlockFields({ block, set }) {
         </>
       );
     case "embed":
-      return <Text label="YouTube / Vimeo / iframe URL" value={block.url} onChange={(v) => set({ url: v })} />;
+      return (
+        <>
+          <Text label="YouTube / Vimeo / iframe URL" value={block.url} onChange={(v) => set({ url: v })} />
+          <p style={{ color: "var(--text-tertiary)", fontSize: 13, margin: "2px 0 0" }}>Paste a share or watch URL — it’s embedded responsively on the post.</p>
+        </>
+      );
     case "divider":
       return <p style={{ color: "var(--text-tertiary)", fontSize: 13 }}>A horizontal rule.</p>;
     default:
@@ -133,18 +147,30 @@ function swap(arr, a, b) {
   return c;
 }
 
+const BLOCK_LABEL = Object.fromEntries(BLOCK_TYPES.map((b) => [b.type, b.label]));
+
 function PostEditor({ post, onBack, onSaved }) {
   const [p, setP] = useState(post);
   const [saving, setSaving] = useState(false);
   const set = (patch) => setP((prev) => ({ ...prev, ...patch }));
-  const setBlock = (i, patch) => set({ blocks: p.blocks.map((b, idx) => (idx === i ? { ...b, ...patch } : b)) });
+  const blocks = p.blocks || [];
+  const setBlock = (i, patch) => set({ blocks: blocks.map((b, idx) => (idx === i ? { ...b, ...patch } : b)) });
 
   const save = async () => {
+    const slug = (p.slug || slugify(p.title)).trim();
+    if (!slug) {
+      alert("Add a title or slug before saving.");
+      return;
+    }
+    if (p.status === "published" && !(p.title || "").trim()) {
+      alert("A published post needs a title.");
+      return;
+    }
     setSaving(true);
     try {
       const row = {
         ...p,
-        slug: p.slug || slugify(p.title),
+        slug,
         tags: typeof p.tags === "string" ? p.tags.split(",").map((s) => s.trim()).filter(Boolean) : p.tags || [],
         published_at: p.status === "published" && !p.published_at ? new Date().toISOString() : p.published_at,
       };
@@ -169,7 +195,7 @@ function PostEditor({ post, onBack, onSaved }) {
           <Badge tone={p.status === "published" ? "success" : "neutral"} dot>
             {p.status}
           </Badge>
-          <Button variant="primary" size="md" onClick={save}>
+          <Button variant="primary" size="md" onClick={save} disabled={saving} style={saving ? { opacity: 0.6, pointerEvents: "none" } : undefined}>
             {saving ? "Saving…" : "Save post"}
           </Button>
         </div>
@@ -177,7 +203,16 @@ function PostEditor({ post, onBack, onSaved }) {
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
         <Text label="Title" value={p.title} onChange={(v) => set({ title: v })} />
-        <Text label="Slug" value={p.slug} placeholder={slugify(p.title)} onChange={(v) => set({ slug: v })} />
+        <div style={{ display: "flex", gap: 8, alignItems: "flex-end" }}>
+          <div style={{ flex: 1 }}>
+            <Text label="Slug" value={p.slug} placeholder={slugify(p.title) || "post-url-slug"} onChange={(v) => set({ slug: v })} />
+          </div>
+          <div style={{ marginBottom: 14 }}>
+            <Button variant="soft" size="sm" onClick={() => set({ slug: slugify(p.title) })} title="Generate slug from title">
+              From title
+            </Button>
+          </div>
+        </div>
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
         <Select label="Language" value={p.lang} options={[{ value: "en", label: "English" }, { value: "es", label: "Español" }]} onChange={(v) => set({ lang: v })} />
@@ -187,6 +222,7 @@ function PostEditor({ post, onBack, onSaved }) {
       <Text label="Excerpt" value={p.excerpt} multiline onChange={(v) => set({ excerpt: v })} />
       <Text label="Tags (comma-separated)" value={tagsStr} onChange={(v) => set({ tags: v })} />
       <div style={{ display: "flex", gap: 8, alignItems: "flex-end" }}>
+        {p.cover_url ? <img src={p.cover_url} alt="" style={{ width: 64, height: 44, objectFit: "cover", borderRadius: 8, border: "1px solid var(--border-default)", flexShrink: 0, marginBottom: 14 }} /> : null}
         <div style={{ flex: 1 }}>
           <Text label="Cover image URL" value={p.cover_url} onChange={(v) => set({ cover_url: v })} />
         </div>
@@ -198,14 +234,20 @@ function PostEditor({ post, onBack, onSaved }) {
       <h3 className="admin-h" style={{ fontSize: 16, marginTop: 18, marginBottom: 12 }}>
         Content blocks
       </h3>
-      {(p.blocks || []).map((b, i) => (
+      {blocks.length === 0 && (
+        <p style={{ color: "var(--text-tertiary)", fontSize: 14, margin: "0 0 8px" }}>
+          No blocks yet. Add your first one below to start writing.
+        </p>
+      )}
+      {blocks.map((b, i) => (
         <div className="blocklist-item" key={b.id || i}>
           <div className="blocklist-head">
-            <span className="block-type-tag">{b.type}</span>
-            <div style={{ display: "flex", gap: 4 }}>
-              <Button variant="ghost" size="sm" icon="arrowUp" onClick={() => i > 0 && set({ blocks: swap(p.blocks, i, i - 1) })} />
-              <Button variant="ghost" size="sm" icon="arrowDown" onClick={() => i < p.blocks.length - 1 && set({ blocks: swap(p.blocks, i, i + 1) })} />
-              <Button variant="soft" size="sm" onClick={() => set({ blocks: p.blocks.filter((_, idx) => idx !== i) })}>
+            <span className="block-type-tag">{BLOCK_LABEL[b.type] || b.type}</span>
+            <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
+              <span style={{ fontSize: 11, color: "var(--text-tertiary)", marginRight: 4 }}>{i + 1}/{blocks.length}</span>
+              <Button variant="ghost" size="sm" icon="arrowUp" disabled={i === 0} style={i === 0 ? { opacity: 0.35, pointerEvents: "none" } : undefined} onClick={() => set({ blocks: swap(blocks, i, i - 1) })} />
+              <Button variant="ghost" size="sm" icon="arrowDown" disabled={i === blocks.length - 1} style={i === blocks.length - 1 ? { opacity: 0.35, pointerEvents: "none" } : undefined} onClick={() => set({ blocks: swap(blocks, i, i + 1) })} />
+              <Button variant="soft" size="sm" onClick={() => set({ blocks: blocks.filter((_, idx) => idx !== i) })}>
                 ✕
               </Button>
             </div>
@@ -218,11 +260,20 @@ function PostEditor({ post, onBack, onSaved }) {
         <div className="admin-sub" style={{ marginBottom: 8 }}>Add a block</div>
         <div className="add-block-grid">
           {BLOCK_TYPES.map((bt) => (
-            <button key={bt.type} onClick={() => set({ blocks: [...(p.blocks || []), blankBlock(bt.type)] })}>
+            <button key={bt.type} type="button" onClick={() => set({ blocks: [...blocks, blankBlock(bt.type)] })}>
               <Icon name={bt.icon} size={15} /> {bt.label}
             </button>
           ))}
         </div>
+      </div>
+
+      <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 22, paddingTop: 16, borderTop: "1px solid var(--border-default)" }}>
+        <Button variant="ghost" size="md" onClick={onBack}>
+          Back to posts
+        </Button>
+        <Button variant="primary" size="md" onClick={save} disabled={saving} style={saving ? { opacity: 0.6, pointerEvents: "none" } : undefined}>
+          {saving ? "Saving…" : p.status === "published" ? "Save & publish" : "Save draft"}
+        </Button>
       </div>
     </div>
   );

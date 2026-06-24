@@ -214,6 +214,90 @@
   padding: 32px;
 }
 
+/* success / status note (e.g. magic-link sent) */
+.admin-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.45;
+}
+.admin-note--ok {
+  color: var(--status-success);
+  background: var(--status-success-soft, color-mix(in srgb, var(--status-success) 12%, transparent));
+  border: 1px solid color-mix(in srgb, var(--status-success) 30%, transparent);
+}
+.admin-note svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* inline form error */
+.admin-error {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--status-danger);
+  font-size: 13px;
+  font-weight: 500;
+  margin: 0 0 12px;
+}
+.admin-error svg {
+  flex-shrink: 0;
+}
+
+/* small helper hint under the form */
+.admin-hint {
+  margin: 18px 0 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-subtle);
+  color: var(--text-quaternary);
+  font-size: 12px;
+  line-height: 1.55;
+}
+.admin-hint strong {
+  color: var(--text-tertiary);
+  font-weight: 600;
+}
+
+/* stacked actions on the not-admin / error screens */
+.admin-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+/* loading splash */
+.admin-loading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-tertiary);
+  font-size: 14px;
+  font-weight: 500;
+}
+.admin-spinner {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--border-strong);
+  border-top-color: var(--brand);
+  animation: admin-spin 0.7s linear infinite;
+}
+@keyframes admin-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .admin-spinner {
+    animation: none;
+  }
+}
+
 /* ---- Logo / blog list rows ---- */
 .logo-row,
 .post-row {

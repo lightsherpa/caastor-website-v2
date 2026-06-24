@@ -1,14 +1,21 @@
 /* Shared FAQ accordion (FAQItem + FAQList). Reused by Home + Pricing + FAQ page. */
-import { useState } from "react";
+import { useId, useState } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import "./faq-extra.css";
 
-function FAQItem({ q, a, open, onToggle }) {
+function FAQItem({ q, a, open, onToggle, btnId, panelId }) {
   const reduce = useReducedMotion();
   return (
     <div className={"fx-item" + (open ? " is-open" : "")}>
       <h3 className="fx-h">
-        <button className="fx-q" onClick={onToggle} aria-expanded={open}>
+        <button
+          type="button"
+          id={btnId}
+          className="fx-q"
+          onClick={onToggle}
+          aria-expanded={open}
+          aria-controls={panelId}
+        >
           <span className="balance fx-q-text">{q}</span>
           <span className="fx-affordance" aria-hidden="true">
             <span className="fx-bar fx-bar-h" />
@@ -19,6 +26,9 @@ function FAQItem({ q, a, open, onToggle }) {
       <AnimatePresence initial={false}>
         {open && (
           <motion.div
+            id={panelId}
+            role="region"
+            aria-labelledby={btnId}
             className="fx-a"
             initial={reduce ? { height: "auto", opacity: 1 } : { height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
@@ -40,6 +50,7 @@ function FAQItem({ q, a, open, onToggle }) {
 
 export function FAQList({ items }) {
   const [openIdx, setOpenIdx] = useState(0);
+  const uid = useId();
   return (
     <div className="fx-list">
       {items.map((it, i) => (
@@ -49,6 +60,8 @@ export function FAQList({ items }) {
           a={it.a}
           open={openIdx === i}
           onToggle={() => setOpenIdx((cur) => (cur === i ? -1 : i))}
+          btnId={`${uid}-q-${i}`}
+          panelId={`${uid}-a-${i}`}
         />
       ))}
     </div>

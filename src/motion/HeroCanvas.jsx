@@ -2,9 +2,11 @@
    Caastor v2 — HeroCanvas
    A GPU-shader particle field for the dark hero. Three.js is loaded
    lazily (its own chunk) AFTER mount, so first paint shows the static
-   gradient fallback and LCP stays fast. Hard-skips on reduced-motion,
-   small screens, Save-Data and missing WebGL. Pauses when offscreen or
-   the tab is hidden, caps DPR, and fully disposes on unmount.
+   gradient fallback and LCP stays fast. The Three.js chunk is never even
+   fetched on reduced-motion, narrow viewports, coarse/touch pointers,
+   Save-Data, slow networks, low-memory devices, or missing WebGL — only the
+   static gradient shows there. When active it pauses offscreen and on hidden
+   tabs, caps DPR conservatively, and fully disposes on unmount.
    ────────────────────────────────────────────────────────────────── */
 import { useEffect, useRef, useState } from "react";
 import { useReducedMotion } from "motion/react";
@@ -80,7 +82,9 @@ function hasWebGL() {
 function initScene(THREE, canvas) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: "high-performance" });
   renderer.setClearColor(0x000000, 0);
-  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  // Cap DPR conservatively — beyond 1.5 the cost climbs fast for no visible
+  // gain on this soft, glowing field.
+  const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
   renderer.setPixelRatio(dpr);
 
   const scene = new THREE.Scene();
@@ -153,7 +157,7 @@ function initScene(THREE, canvas) {
     cancelAnimationFrame(raf);
   };
 
-  const io = new IntersectionObserver(([en]) => (en.isIntersecting ? start() : stop()), { threshold: 0 });
+  const io = new IntersectionObserver(([en]) => (en.isIntersecting ? start() : stop()), { threshold: 0, rootMargin: "200px" });
   io.observe(canvas);
   const onVis = () => (document.hidden ? stop() : start());
   document.addEventListener("visibilitychange", onVis);
@@ -178,9 +182,17 @@ export function HeroCanvas() {
 
   useEffect(() => {
     if (reduce) return;
+    // Hard-skip the whole Three.js chunk (never even fetch it) on devices that
+    // shouldn't pay the cost: reduced-motion, narrow viewports, touch/coarse
+    // pointers (phones & tablets), Save-Data, and low-memory devices. Only the
+    // static gradient fallback renders there.
     const small = window.matchMedia("(max-width: 760px)").matches;
-    const saveData = navigator.connection && navigator.connection.saveData;
-    if (small || saveData || !hasWebGL()) return; // fallback gradient only
+    const coarse = window.matchMedia("(hover: none), (pointer: coarse)").matches;
+    const conn = navigator.connection || {};
+    const saveData = !!conn.saveData;
+    const slowNet = typeof conn.effectiveType === "string" && /(^|-)2g$/.test(conn.effectiveType);
+    const lowMem = typeof navigator.deviceMemory === "number" && navigator.deviceMemory <= 4;
+    if (small || coarse || saveData || slowNet || lowMem || !hasWebGL()) return;
 
     let cancelled = false;
     let cleanup = () => {};

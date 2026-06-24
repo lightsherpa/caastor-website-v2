@@ -5,4 +5,18 @@ import react from "@vitejs/plugin-react";
 export default defineConfig({
   base: "/",
   plugins: [react()],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Stable vendor code split into long-lived cacheable chunks.
+          react: ["react", "react-dom"],
+          motion: ["motion"],
+          three: ["three"],
+          supabase: ["@supabase/supabase-js"],
+          gsap: ["gsap"],
+        },
+      },
+    },
+  },
 });

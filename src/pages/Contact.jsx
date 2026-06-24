@@ -51,26 +51,86 @@ export function ContactPage({ t }) {
               </Reveal>
             </div>
 
-            {/* right: inline Cal.com scheduler */}
+            {/* right: premium-framed inline Cal.com scheduler */}
             <Reveal delay={120}>
               <div
                 style={{
+                  position: "relative",
                   background: "var(--bg-canvas)",
                   border: "1px solid var(--border-default)",
-                  borderRadius: 20,
+                  borderRadius: 24,
                   boxShadow: "var(--shadow-lg)",
-                  padding: 8,
                   overflow: "hidden",
-                  height: 540,
-                  maxHeight: "70vh",
                 }}
               >
-                <Cal
-                  calLink={CAL_LINK}
-                  config={{ theme: "auto", layout: "month_view" }}
-                  style={{ width: "100%", height: "100%", overflow: "auto" }}
+                {/* brand hairline along the top edge of the scheduler panel */}
+                <span
+                  aria-hidden="true"
+                  style={{
+                    position: "absolute",
+                    insetInline: 0,
+                    top: 0,
+                    height: 3,
+                    background: "linear-gradient(90deg, transparent, var(--brand) 22%, var(--brand-strong) 50%, var(--brand) 78%, transparent)",
+                    zIndex: 2,
+                  }}
                 />
+                {/* panel header: eyebrow + micro reassurance */}
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 10,
+                    padding: "18px 20px",
+                    borderBottom: "1px solid var(--border-default)",
+                  }}
+                >
+                  <span
+                    style={{
+                      flexShrink: 0,
+                      width: 30,
+                      height: 30,
+                      borderRadius: 999,
+                      background: "var(--brand-soft)",
+                      color: "var(--brand-strong)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Icon name="message" size={16} />
+                  </span>
+                  <div style={{ minWidth: 0 }}>
+                    <div className="t-overline" style={{ marginBottom: 2 }}>
+                      {c.button}
+                    </div>
+                    <div style={{ fontSize: 13, lineHeight: "18px", color: "var(--text-tertiary)" }}>
+                      {c.micro}
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ padding: 8, height: 520, maxHeight: "66vh" }}>
+                  <Cal
+                    calLink={CAL_LINK}
+                    config={{ theme: "auto", layout: "month_view" }}
+                    style={{ width: "100%", height: "100%", overflow: "auto" }}
+                  />
+                </div>
               </div>
+
+              {/* fallback: if the embed is slow, open the Cal page directly */}
+              <p style={{ marginTop: 14, fontSize: 13, lineHeight: "20px", color: "var(--text-tertiary)", textAlign: "center" }}>
+                <a
+                  href={`https://${CAL_LINK}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: "var(--brand-strong)", fontWeight: 600, textDecoration: "underline", textUnderlineOffset: 3, display: "inline-flex", alignItems: "center", gap: 6 }}
+                >
+                  {c.button}
+                  <Icon name="arrowRight" size={13} />
+                </a>
+              </p>
             </Reveal>
           </div>
         </div>

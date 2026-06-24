@@ -58,6 +58,58 @@ function restoreMetrics(merged, base) {
   return merged;
 }
 
+/* Re-attach code-owned structural fields that a live/stale CMS doc may be
+   missing. CMS arrays replace wholesale and object overlays can predate newer
+   code-owned keys, so each guard copies these back from the bundle (matched by
+   index/name) without disturbing CMS-owned copy. */
+function restoreStructural(merged, base) {
+  for (const lang of ["en", "es"]) {
+    const m = merged[lang];
+    const b = base[lang];
+    if (!m || !b) continue;
+
+    // home.intro.compare — code-owned comparison table.
+    if (m.home?.intro && !m.home.intro.compare && b.home?.intro?.compare) {
+      m.home.intro.compare = b.home.intro.compare;
+    }
+
+    // about.timeline — code-owned milestone list.
+    if (m.about && !Array.isArray(m.about.timeline) && Array.isArray(b.about?.timeline)) {
+      m.about.timeline = b.about.timeline;
+    }
+
+    // home.bundles.items[].{price,useCase,excludes} — matched by name, then index.
+    const mItems = m.home?.bundles?.items;
+    const bItems = b.home?.bundles?.items;
+    if (Array.isArray(mItems) && Array.isArray(bItems)) {
+      mItems.forEach((it, i) => {
+        if (!it) return;
+        const src = bItems.find((x) => x.name === it.name) || bItems[i];
+        if (!src) return;
+        if (it.price === undefined) it.price = src.price;
+        if (it.useCase === undefined) it.useCase = src.useCase;
+        if (it.excludes === undefined) it.excludes = src.excludes;
+      });
+    }
+
+    // pricing.plans[].priceYearly (matched by sku, then index) + pricing.billing + pricing.yearlyPer.
+    const mPlans = m.pricing?.plans;
+    const bPlans = b.pricing?.plans;
+    if (Array.isArray(mPlans) && Array.isArray(bPlans)) {
+      mPlans.forEach((p, i) => {
+        if (!p) return;
+        const src = bPlans.find((x) => x.sku === p.sku) || bPlans[i];
+        if (src && p.priceYearly === undefined) p.priceYearly = src.priceYearly;
+      });
+    }
+    if (m.pricing) {
+      if (m.pricing.billing === undefined && b.pricing?.billing !== undefined) m.pricing.billing = b.pricing.billing;
+      if (m.pricing.yearlyPer === undefined && b.pricing?.yearlyPer !== undefined) m.pricing.yearlyPer = b.pricing.yearlyPer;
+    }
+  }
+  return merged;
+}
+
 /* The logo *images* are CMS-managed (user uploads), but the surrounding
    copy is code-owned. The live CMS doc has stale, off-brand headline copy
    ("…Apple, and a bunch of startups"), so restore those two strings from
@@ -80,7 +132,9 @@ export function mergeContent(bundled, cms) {
     en: deepMerge(bundled.en, cms.en),
     es: deepMerge(bundled.es, cms.es),
   };
-  return deepSanitize(restoreLogoCopy(restoreMetrics(merged, bundled), bundled));
+  return deepSanitize(
+    restoreLogoCopy(restoreStructural(restoreMetrics(merged, bundled), bundled), bundled)
+  );
 }
 
 /** Fetch the singleton site_content document (id = 1). */

@@ -59,10 +59,30 @@
 .pr-seg-btn.is-active {
   color: var(--text-primary);
 }
+/* Visible keyboard focus ring — only on keyboard focus, not pointer. */
+.pr-seg-btn:focus-visible {
+  outline: 2px solid var(--brand-strong);
+  outline-offset: 2px;
+  color: var(--text-primary);
+}
 
 .pr-save {
   display: inline-flex;
   align-items: center;
+}
+
+/* aria-live note: announced by AT, hidden visually (the price already
+   updates on screen, so a duplicate visible string would be redundant). */
+.pr-live {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -253,6 +273,14 @@
 
 .prc-cta {
   padding: 0 24px;
+}
+/* Keyboard focus ring on plan CTAs. The Button is inline-styled with no
+   outline of its own; scope a high-contrast ring here so it reads on both
+   the brand-yellow primary fill and the light secondary buttons. */
+.prc-cta button:focus-visible {
+  outline: 2px solid var(--text-primary);
+  outline-offset: 3px;
+  border-radius: var(--radius-pill);
 }
 
 /* Feature list */
