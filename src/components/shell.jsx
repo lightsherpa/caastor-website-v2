@@ -2,12 +2,22 @@
    Caastor v2 — shared shell: Reveal, Eyebrow, SectionHead, Header, Footer
    ────────────────────────────────────────────────────────────────── */
 import { useState, useEffect } from "react";
-import { motion } from "motion/react";
 import { Icon, Button } from "../ds/components.jsx";
 import { bookingProps } from "../lib/booking.js";
 
 /* Reveal lives in the motion layer; re-exported here for back-compat. */
 export { Reveal } from "../motion/primitives.jsx";
+
+/* One icon per nav route (revise-the-menu reference). */
+const NAV_ICONS = {
+  home: "home",
+  services: "layers",
+  pricing: "tag",
+  contact: "message",
+  about: "users",
+  blog: "blog",
+  faq: "help",
+};
 
 /* ── Eyebrow + section head ────────────────────────────────── */
 export function Eyebrow({ children, dot = true }) {
@@ -90,6 +100,8 @@ export function Header({ t, lang, setLang, theme, toggleTheme, route, navigate }
 
   return (
     <header className={"site-header" + (scrolled ? " scrolled" : "") + (onDark ? " on-dark" : "")}>
+      {/* nav icons (reference revise): each item carries an icon; the active
+          route's icon bounces in via the navBounce keyframe. */}
       <div className="container header-inner">
         <a
           onClick={() => navigate("home")}
@@ -108,22 +120,22 @@ export function Header({ t, lang, setLang, theme, toggleTheme, route, navigate }
         </a>
 
         <nav className="nav-links">
-          {navItems.map(([key, label]) => (
-            <span
-              key={key}
-              className={"nav-link" + (route === key ? " active" : "")}
-              onClick={() => navigate(key)}
-            >
-              {label}
-              {route === key && (
-                <motion.span
-                  className="nav-underline"
-                  layoutId="nav-underline"
-                  transition={{ type: "spring", stiffness: 420, damping: 34 }}
-                />
-              )}
-            </span>
-          ))}
+          {navItems.map(([key, label]) => {
+            const active = route === key;
+            return (
+              <span
+                key={key}
+                className={"nav-link nav-link--ic" + (active ? " active" : "")}
+                onClick={() => navigate(key)}
+                aria-current={active ? "page" : undefined}
+              >
+                <span className={"nav-ic" + (active ? " on" : "")}>
+                  <Icon name={NAV_ICONS[key]} size={16} />
+                </span>
+                <span className="nav-lbl">{label}</span>
+              </span>
+            );
+          })}
         </nav>
 
         <div className="header-controls">
@@ -161,16 +173,22 @@ export function Header({ t, lang, setLang, theme, toggleTheme, route, navigate }
         style={{ background: "var(--bg-canvas)", padding: "28px 0 40px" }}
       >
         <div className="container" style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-          {navItems.map(([key, label]) => (
-            <span
-              key={key}
-              className={"nav-link" + (route === key ? " active" : "")}
-              style={{ padding: "12px 12px", fontSize: 16 }}
-              onClick={() => navigate(key)}
-            >
-              {label}
-            </span>
-          ))}
+          {navItems.map(([key, label]) => {
+            const active = route === key;
+            return (
+              <span
+                key={key}
+                className={"nav-link nav-link--ic" + (active ? " active" : "")}
+                style={{ padding: "12px 12px", fontSize: 16 }}
+                onClick={() => navigate(key)}
+              >
+                <span className={"nav-ic" + (active ? " on" : "")}>
+                  <Icon name={NAV_ICONS[key]} size={18} />
+                </span>
+                <span className="nav-lbl">{label}</span>
+              </span>
+            );
+          })}
           <div style={{ marginTop: 12 }}>
             <Button variant="primary" size="lg" full iconEnd="arrowRight" {...bookingProps}>
               {t.headerCta}

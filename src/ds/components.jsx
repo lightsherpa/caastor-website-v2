@@ -55,6 +55,33 @@ export const ICONS = {
   ),
   activity: <path d="M3 12h4l3-9 4 18 3-9h4" />,
   flag: <path d="M4 21V4m0 0 12 1-2 4 2 4H4" />,
+  home: (
+    <>
+      <path d="m3 11 9-8 9 8" />
+      <path d="M5 9.5V21h14V9.5" />
+      <path d="M9.5 21v-6h5v6" />
+    </>
+  ),
+  tag: (
+    <>
+      <path d="M3 12V4h8l9 9-8 8-9-9Z" />
+      <circle cx="7.5" cy="7.5" r="1.2" />
+    </>
+  ),
+  blog: (
+    <>
+      <path d="M6 3h7l5 5v13H6z" />
+      <path d="M13 3v5h5" />
+      <path d="M9 13h6M9 17h4" />
+    </>
+  ),
+  help: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M9.5 9.2a2.6 2.6 0 1 1 3.6 2.4c-.7.4-1.1.9-1.1 1.7" />
+      <path d="M12 17h.01" />
+    </>
+  ),
   more: (
     <>
       <circle cx="5" cy="12" r="1.4" />
