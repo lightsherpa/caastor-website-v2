@@ -50,7 +50,10 @@ function Login() {
     try {
       const { error } = await supabase.auth.signInWithOtp({
         email: trimmed,
-        options: { emailRedirectTo: window.location.origin + "/admin" },
+        // Redirect to the site root (which matches Supabase's Site URL, so it's
+        // auto-allowed and avoids "requested path is invalid"). main.jsx then
+        // forwards the auth token to /admin.
+        options: { emailRedirectTo: window.location.origin },
       });
       if (error) setErr(error.message || "Couldn’t send the link. Please try again.");
       else setSent(true);
