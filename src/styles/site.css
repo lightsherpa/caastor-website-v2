@@ -244,19 +244,7 @@ a { color: inherit; text-decoration: none; }
 .faq-a { overflow: hidden; max-height: 0; transition: max-height var(--dur-slow) var(--ease-out); }
 .faq-a-inner { padding: 0 0 22px; font-size: 16px; line-height: 26px; color: var(--text-secondary); max-width: 70ch; }
 
-/* footer */
-.site-footer { background: var(--bg-inverse); color: var(--text-inverse); padding: 72px 0 36px; }
-[data-theme="dark"] .site-footer { background: #050507; }
-.footer-grid { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1.4fr; gap: 40px; }
-.footer-link { color: rgba(255,255,255,0.66); font-size: 14px; cursor: pointer; transition: color var(--dur-fast) var(--ease-out); display: block; padding: 5px 0; }
-.footer-link:hover { color: #fff; }
-.footer-h { font-size: 12px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.45); margin-bottom: 12px; }
-.footer-input {
-  flex: 1; height: 42px; padding: 0 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.16);
-  background: rgba(255,255,255,0.06); color: #fff; font-family: inherit; font-size: 14px; outline: none;
-}
-.footer-input::placeholder { color: rgba(255,255,255,0.4); }
-.footer-input:focus { border-color: var(--accent); box-shadow: var(--shadow-focus); }
+/* footer styles now live in the Footer component's co-located footer.css */
 
 /* ---- Reveal on scroll (transform-only so content is never hidden if
    animation is throttled, e.g. background tab / offscreen iframe) ---- */
