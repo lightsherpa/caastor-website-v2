@@ -4,6 +4,7 @@ import { Icon } from "../ds/components.jsx";
 import { Reveal, Eyebrow } from "../components/shell.jsx";
 import { FinalCTA } from "../components/FinalCTA.jsx";
 import { fetchPublishedPosts, BLOG_ENABLED } from "../lib/blog.js";
+import "./blog-extra.css";
 
 const COPY = {
   en: { eyebrow: "Blog", h1: "Ideas, craft & the occasional bad pun.", sub: "Notes on design, brand and shipping fast without cutting corners.", empty: "No posts yet, the first one is on its way.", soon: "The blog is being set up. Check back soon.", read: "Read", min: "min read" },
@@ -71,39 +72,54 @@ export function BlogIndexPage({ t, lang, navigate }) {
               <p className="t-h3" style={{ color: "var(--text-secondary)" }}>{BLOG_ENABLED ? c.empty : c.soon}</p>
             </div>
           ) : (
-            <div className="blog-grid">
-              {posts.map((p, i) => (
-                <Reveal key={p.slug} delay={(i % 3) * 80}>
-                  <article className="blog-card" onClick={() => navigate(`/blog/${p.slug}`)}>
-                    {p.cover_url ? (
-                      <img className="blog-card-cover" src={p.cover_url} alt={p.title} loading="lazy" />
-                    ) : (
-                      <div className="blog-card-cover" />
-                    )}
-                    <div className="blog-card-body">
-                      <div className="blog-card-meta">
-                        {(p.tags || []).slice(0, 2).map((tag) => (
-                          <span key={tag} className="blog-tag">
-                            {tag}
-                          </span>
-                        ))}
-                        <span>{fmtDate(p.published_at, lang)}</span>
+            <div className="bx-grid">
+              {posts.map((p, i) => {
+                const feature = i === 0;
+                const primaryTag = (p.tags || [])[0];
+                return (
+                  <Reveal key={p.slug} delay={(i % 3) * 70}>
+                    <article
+                      className={`bx-card${feature ? " bx-card--feature" : ""}`}
+                      role="link"
+                      tabIndex={0}
+                      onClick={() => navigate(`/blog/${p.slug}`)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          navigate(`/blog/${p.slug}`);
+                        }
+                      }}
+                    >
+                      <div className={`bx-cover${p.cover_url ? "" : " bx-cover--empty"}`}>
+                        {primaryTag && <span className="bx-cover-tag">{primaryTag}</span>}
+                        {p.cover_url ? (
+                          <img className="bx-cover-img" src={p.cover_url} alt={p.title} loading="lazy" />
+                        ) : (
+                          <img className="bx-cover-mark" src="/assets/mascot-yellow.png" alt="" loading="lazy" />
+                        )}
                       </div>
-                      <h3 className="t-h2" style={{ fontSize: 21, lineHeight: "27px" }}>
-                        {p.title}
-                      </h3>
-                      {p.excerpt && (
-                        <p className="pretty" style={{ fontSize: 15, lineHeight: "23px", color: "var(--text-tertiary)" }}>
-                          {p.excerpt}
-                        </p>
-                      )}
-                      <span className="text-link" style={{ marginTop: "auto", fontSize: 14 }}>
-                        {c.read} <Icon name="arrowRight" size={15} />
-                      </span>
-                    </div>
-                  </article>
-                </Reveal>
-              ))}
+                      <div className="bx-body">
+                        <div className="bx-meta">
+                          {(p.tags || []).slice(1, 3).map((tag) => (
+                            <span key={tag} className="bx-tag">
+                              {tag}
+                            </span>
+                          ))}
+                          <span>{fmtDate(p.published_at, lang)}</span>
+                        </div>
+                        <h3 className="bx-title balance">{p.title}</h3>
+                        {p.excerpt && <p className="bx-excerpt pretty">{p.excerpt}</p>}
+                        <span className="bx-read">
+                          {c.read}
+                          <span className="bx-chip">
+                            <Icon name="arrowRight" size={15} />
+                          </span>
+                        </span>
+                      </div>
+                    </article>
+                  </Reveal>
+                );
+              })}
             </div>
           )}
         </div>

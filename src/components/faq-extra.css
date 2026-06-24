@@ -1,0 +1,216 @@
+/* ──────────────────────────────────────────────────────────────
+   Caastor v2 — FAQ accordion (faq-extra)
+   Refined disclosure: bordered card list, animated +/- affordance,
+   hover/active states. Animation handled by motion in Faq.jsx.
+   ────────────────────────────────────────────────────────────── */
+
+.fx-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ── Item shell ── */
+.fx-item {
+  position: relative;
+  background: var(--bg-canvas);
+  border: 1px solid var(--border-default);
+  border-radius: 16px;
+  box-shadow: var(--shadow-xs);
+  overflow: hidden;
+  transition:
+    border-color var(--dur-base, 240ms) var(--ease-out, ease),
+    box-shadow var(--dur-base, 240ms) var(--ease-out, ease),
+    background var(--dur-base, 240ms) var(--ease-out, ease);
+}
+
+/* Brand accent rail that reveals on open */
+.fx-item::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--brand);
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform var(--dur-base, 240ms) var(--ease-spring, cubic-bezier(0.34, 1.56, 0.64, 1));
+}
+
+.fx-item:hover {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-sm);
+}
+
+.fx-item.is-open {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-md), 0 14px 34px rgba(var(--brand-glow), 0.1);
+}
+
+.fx-item.is-open::before {
+  transform: scaleY(1);
+}
+
+/* ── Question row ── */
+.fx-h {
+  margin: 0;
+  font: inherit;
+}
+
+.fx-q {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  width: 100%;
+  padding: 22px 22px 22px 24px;
+  background: transparent;
+  border: 0;
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+  color: var(--text-primary);
+  -webkit-tap-highlight-color: transparent;
+  transition: background var(--dur-fast, 160ms) var(--ease-out, ease);
+}
+
+.fx-q:hover {
+  background: var(--bg-muted);
+}
+
+.fx-q:active {
+  background: var(--border-subtle);
+}
+
+.fx-q:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: -2px;
+  border-radius: 16px;
+}
+
+.fx-q-text {
+  font-size: 17px;
+  line-height: 26px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+  transition: color var(--dur-fast, 160ms) var(--ease-out, ease);
+}
+
+.fx-item.is-open .fx-q-text {
+  color: var(--brand-strong);
+}
+
+/* ── Animated +/- affordance ── */
+.fx-affordance {
+  position: relative;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: var(--bg-muted);
+  border: 1px solid var(--border-default);
+  transition:
+    background var(--dur-base, 240ms) var(--ease-out, ease),
+    border-color var(--dur-base, 240ms) var(--ease-out, ease),
+    transform var(--dur-base, 240ms) var(--ease-spring, cubic-bezier(0.34, 1.56, 0.64, 1));
+}
+
+.fx-q:hover .fx-affordance {
+  background: var(--brand-soft);
+  border-color: transparent;
+}
+
+.fx-item.is-open .fx-affordance {
+  background: var(--brand);
+  border-color: transparent;
+  transform: rotate(180deg);
+}
+
+.fx-bar {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 13px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--text-secondary);
+  transform: translate(-50%, -50%);
+  transition:
+    background var(--dur-base, 240ms) var(--ease-out, ease),
+    transform var(--dur-base, 240ms) var(--ease-spring, cubic-bezier(0.34, 1.56, 0.64, 1)),
+    opacity var(--dur-base, 240ms) var(--ease-out, ease);
+}
+
+.fx-bar-v {
+  transform: translate(-50%, -50%) rotate(90deg);
+}
+
+.fx-q:hover .fx-bar {
+  background: var(--brand-strong);
+}
+
+/* On open: vertical bar collapses to a minus; sit on brand fill */
+.fx-item.is-open .fx-bar {
+  background: var(--text-on-brand);
+}
+
+.fx-item.is-open .fx-bar-v {
+  transform: translate(-50%, -50%) rotate(0deg);
+  opacity: 0;
+}
+
+/* ── Answer ── */
+.fx-a-inner {
+  padding: 2px 24px 24px 24px;
+  font-size: 15.5px;
+  line-height: 25px;
+  color: var(--text-secondary);
+  max-width: 62ch;
+}
+
+.fx-a-inner p {
+  margin: 0 0 12px;
+}
+
+.fx-a-inner p:last-child {
+  margin-bottom: 0;
+}
+
+.fx-a-inner a {
+  color: var(--brand-strong);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.fx-a-inner strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+@media (max-width: 560px) {
+  .fx-q {
+    padding: 18px 16px 18px 18px;
+    gap: 12px;
+  }
+  .fx-q-text {
+    font-size: 16px;
+    line-height: 24px;
+  }
+  .fx-a-inner {
+    padding: 2px 18px 20px 18px;
+    font-size: 15px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fx-item,
+  .fx-item::before,
+  .fx-affordance,
+  .fx-bar,
+  .fx-q,
+  .fx-q-text {
+    transition: none;
+  }
+}

@@ -37,9 +37,22 @@ export function FaqPage({ t, navigate }) {
             <FAQList items={f.items} />
           </Reveal>
           <Reveal delay={80}>
-            <div style={{ marginTop: 48, textAlign: "center", padding: "40px 28px", background: "var(--bg-app)", borderRadius: 18, border: "1px solid var(--border-default)" }}>
-              <p className="t-h3" style={{ marginBottom: 16 }}>
+            <div
+              style={{
+                marginTop: 56,
+                textAlign: "center",
+                padding: "44px 28px",
+                background: "linear-gradient(180deg, var(--bg-app), var(--bg-muted))",
+                borderRadius: 20,
+                border: "1px solid var(--border-default)",
+                boxShadow: "var(--shadow-sm)",
+              }}
+            >
+              <p className="t-h3" style={{ marginBottom: 8 }}>
                 {t.contact.h1}
+              </p>
+              <p className="pretty" style={{ fontSize: 15.5, lineHeight: "24px", color: "var(--text-secondary)", maxWidth: 420, margin: "0 auto 22px" }}>
+                {t.contact.sub}
               </p>
               <Button variant="primary" size="lg" iconEnd="arrowRight" onClick={() => navigate("contact")}>
                 {f.cta}

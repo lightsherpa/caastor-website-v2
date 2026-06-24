@@ -1,9 +1,9 @@
 /* Caastor v2 — Home page (thin composition; sections live as components) */
 import { Icon } from "../ds/components.jsx";
 import { Reveal, SectionHead } from "../components/shell.jsx";
-import { Marquee } from "../motion/primitives.jsx";
 import { Waves } from "../motion/Waves.jsx";
 import { HeroSection } from "../components/Hero.jsx";
+import { LogoBar } from "../components/LogoBar.jsx";
 import { ShowcaseSection } from "../components/Showcase.jsx";
 import { StepsSection } from "../components/Steps.jsx";
 import { WhyBento } from "../components/WhyBento.jsx";
@@ -23,29 +23,7 @@ export function HomePage({ t, lang, navigate, logoNames }) {
       <HeroSection t={t} lang={lang} navigate={navigate} />
 
       {/* 2 · LOGO BAR */}
-      <section className="section-sm surface-app hairline-top">
-        <div className="container">
-          <Reveal>
-            <p className="balance" style={{ textAlign: "center", maxWidth: 760, margin: "0 auto 8px", fontSize: 17, fontWeight: 600, color: "var(--text-secondary)", lineHeight: "26px" }}>
-              {h.logos.headline}
-            </p>
-            <p style={{ textAlign: "center", marginBottom: 28, fontSize: 13, fontStyle: "italic", color: "var(--text-tertiary)" }}>{h.logos.eyebrow}</p>
-            <Marquee speed={42} gap={16}>
-              {logos.map((n, i) => {
-                const name = typeof n === "string" ? n : n.name;
-                const image = typeof n === "object" ? n.image : null;
-                return image ? (
-                  <img key={i} className="logo-img" src={image} alt={name} loading="lazy" />
-                ) : (
-                  <span key={i} className="logo-chip">
-                    {name}
-                  </span>
-                );
-              })}
-            </Marquee>
-          </Reveal>
-        </div>
-      </section>
+      <LogoBar t={t} logos={logos} />
 
       {/* 3 · POSITIONING — dark, premium old-way vs Caastor with an ambient
           brand-tinted wave field behind an elevated glass panel. */}

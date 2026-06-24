@@ -1,6 +1,6 @@
 /* Caastor v2 — About page */
 import { useReducedMotion } from "motion/react";
-import { Card, Icon } from "../ds/components.jsx";
+import { Icon } from "../ds/components.jsx";
 import { Reveal, Eyebrow, SectionHead } from "../components/shell.jsx";
 import { FinalCTA } from "../components/FinalCTA.jsx";
 import "./about-timeline.css";
@@ -46,13 +46,11 @@ export function AboutPage({ t, navigate }) {
             </div>
             <Reveal delay={140}>
               <div style={{ position: "relative" }}>
-                <img
-                  src="/assets/profile-photo-5.jpg"
-                  alt=""
-                  style={{ width: "100%", borderRadius: 18, boxShadow: "var(--shadow-lg)", display: "block", aspectRatio: "4/5", objectFit: "cover" }}
-                />
-                <div style={{ position: "absolute", left: -22, bottom: -22, background: "var(--brand)", color: "var(--text-on-brand)", borderRadius: 16, padding: "16px 20px", boxShadow: "var(--shadow-lg)", maxWidth: 220 }}>
-                  <div className="serif-accent" style={{ fontSize: 19, lineHeight: "24px" }}>
+                <div className="cstr-hero__photo">
+                  <img src="/assets/profile-photo-5.jpg" alt="" />
+                </div>
+                <div className="cstr-hero__quote">
+                  <div className="serif-accent cstr-hero__quote-text">
                     &ldquo;{t.footer.tagline}&rdquo;
                   </div>
                 </div>
@@ -71,9 +69,14 @@ export function AboutPage({ t, navigate }) {
             </div>
           </Reveal>
           <Reveal delay={60}>
-            <h2 className="t-display-sm balance" style={{ maxWidth: 760, margin: "0 auto" }}>
-              {a.mission}
-            </h2>
+            <div className="cstr-mission">
+              <span className="serif-accent cstr-mission__mark" aria-hidden="true">
+                &ldquo;
+              </span>
+              <h2 className="t-display-sm balance cstr-mission__text">
+                {a.mission}
+              </h2>
+            </div>
           </Reveal>
         </div>
       </section>
@@ -115,24 +118,27 @@ export function AboutPage({ t, navigate }) {
           <Reveal>
             <SectionHead eyebrow={a.eyebrow} title={a.valuesHeader} max={620} />
           </Reveal>
-          <div className="grid grid-3" style={{ marginTop: 48 }}>
-            {a.values.map((v, i) => (
-              <Reveal key={i} delay={i * 90}>
-                <Card padded={28} hover style={{ height: "100%" }}>
-                  <div className="feature-card">
-                    <span className={"icon-tile" + (i === 1 ? " accent" : "")}>
-                      <Icon name={["star", "sparkles", "users"][i]} size={22} />
+          <div className="cstr-values">
+            {a.values.map((v, i) => {
+              const valueIcons = ["star", "sparkles", "users"];
+              return (
+                <Reveal key={i} delay={i * 90}>
+                  <article className={"cstr-value" + (i === 1 ? " cstr-value--accent" : "")} style={{ height: "100%" }}>
+                    <span className="cstr-value__index" aria-hidden="true">
+                      {String(i + 1).padStart(2, "0")}
                     </span>
-                    <h3 className="t-h3" style={{ marginTop: 4 }}>
-                      {v.title}
-                    </h3>
-                    <p className="pretty" style={{ fontSize: 15, lineHeight: "24px", color: "var(--text-secondary)" }}>
-                      {v.body}
-                    </p>
-                  </div>
-                </Card>
-              </Reveal>
-            ))}
+                    <span className="cstr-value__bracket tl" aria-hidden="true" />
+                    <span className="cstr-value__bracket br" aria-hidden="true" />
+                    <span className="cstr-value__tile">
+                      <Icon name={valueIcons[i % valueIcons.length]} size={26} />
+                    </span>
+                    <h3 className="t-h3 cstr-value__title">{v.title}</h3>
+                    <p className="pretty cstr-value__body">{v.body}</p>
+                    <span className="cstr-value__rule" aria-hidden="true" />
+                  </article>
+                </Reveal>
+              );
+            })}
           </div>
         </div>
       </section>

@@ -2,8 +2,10 @@
    Caastor v2 — shared shell: Reveal, Eyebrow, SectionHead, Header, Footer
    ────────────────────────────────────────────────────────────────── */
 import { useState, useEffect } from "react";
+import { motion, useReducedMotion } from "motion/react";
 import { Icon, Button } from "../ds/components.jsx";
 import { bookingProps } from "../lib/booking.js";
+import "./footer.css";
 
 /* Reveal lives in the motion layer; re-exported here for back-compat. */
 export { Reveal } from "../motion/primitives.jsx";
@@ -204,6 +206,13 @@ export function Header({ t, lang, setLang, theme, toggleTheme, route, navigate }
 export function Footer({ t, navigate }) {
   const [email, setEmail] = useState("");
   const [done, setDone] = useState(false);
+  const reduce = useReducedMotion();
+
+  const submit = (e) => {
+    if (e) e.preventDefault();
+    if (email.includes("@")) setDone(true);
+  };
+
   const navItems = [
     ["home", t.nav.home],
     ["services", t.nav.services],
@@ -213,60 +222,74 @@ export function Footer({ t, navigate }) {
     ["faq", t.nav.faq],
     ["blog", t.nav.blog],
   ];
+
   return (
-    <footer className="site-footer">
-      <div className="container">
-        <div className="footer-grid">
+    <footer className="ftr">
+      <div className="container ftr-inner">
+        {/* Hero band: big serif tagline + playful mascot */}
+        <div className="ftr-hero">
           <div>
-            <img src="/assets/logotype-white.svg" alt="Caastor" style={{ height: 24, marginBottom: 18 }} />
-            <p className="serif-accent" style={{ fontSize: 26, lineHeight: "32px", color: "#fff", maxWidth: 320, margin: 0 }}>
-              {t.footer.tagline}
-            </p>
+            <img className="ftr-wordmark" src="/assets/logotype-white.svg" alt="Caastor" />
+            <p className="serif-accent ftr-tagline">{t.footer.tagline}</p>
+          </div>
+          <div className="ftr-mascot-wrap">
+            <span className="ftr-mascot-halo" aria-hidden="true" />
+            <motion.img
+              className="ftr-mascot"
+              src="/assets/mascot-yellow.png"
+              alt=""
+              aria-hidden="true"
+              animate={reduce ? undefined : { y: [0, -10, 0], rotate: [0, -2.5, 0] }}
+              transition={
+                reduce
+                  ? undefined
+                  : { duration: 6, repeat: Infinity, ease: "easeInOut" }
+              }
+            />
+          </div>
+        </div>
+
+        {/* Columns + featured newsletter panel */}
+        <div className="ftr-main">
+          <div>
+            <h3 className="ftr-h">{t.footer.colNav}</h3>
+            <div className="ftr-col-links">
+              {navItems.map(([key, label]) => (
+                <button key={key} className="ftr-link" onClick={() => navigate(key)}>
+                  {label}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div>
-            <div className="footer-h">{t.footer.colNav}</div>
-            {navItems.map(([key, label]) => (
-              <span key={key} className="footer-link" onClick={() => navigate(key)}>
-                {label}
-              </span>
-            ))}
+            <h3 className="ftr-h">{t.footer.colLegal}</h3>
+            <div className="ftr-col-links">
+              <button className="ftr-link">{t.footer.privacy}</button>
+              <button className="ftr-link">{t.footer.terms}</button>
+              <button className="ftr-link" onClick={() => navigate("contact")}>
+                {t.nav.contact}
+              </button>
+            </div>
           </div>
 
-          <div>
-            <div className="footer-h">{t.footer.colLegal}</div>
-            <span className="footer-link">{t.footer.privacy}</span>
-            <span className="footer-link">{t.footer.terms}</span>
-            <span className="footer-link" onClick={() => navigate("contact")}>
-              {t.nav.contact}
-            </span>
-          </div>
-
-          <div>
-            <div className="footer-h">Newsletter</div>
-            <p style={{ color: "rgba(255,255,255,0.66)", fontSize: 14, lineHeight: "22px", margin: "0 0 14px", maxWidth: 280 }}>
-              {t.footer.newsletter}
-            </p>
+          <div className="ftr-news">
+            <h3 className="ftr-news-title">{t.footer.newsletterCta}</h3>
+            <p className="ftr-news-copy">{t.footer.newsletter}</p>
             {done ? (
-              <div style={{ display: "flex", alignItems: "center", gap: 8, color: "var(--status-success)", fontSize: 14, fontWeight: 600 }}>
-                <Icon name="check" size={16} /> {t.footer.newsletterCta} ✓
+              <div className="ftr-done">
+                <Icon name="check" size={18} /> {t.footer.newsletterCta} ✓
               </div>
             ) : (
-              <form
-                style={{ display: "flex", gap: 8 }}
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  if (email.includes("@")) setDone(true);
-                }}
-              >
+              <form className="ftr-form" onSubmit={submit}>
                 <input
-                  className="footer-input"
+                  className="ftr-input"
                   type="email"
                   placeholder={t.footer.emailPh}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
-                <Button variant="accent" size="md" onClick={() => { if (email.includes("@")) setDone(true); }}>
+                <Button variant="primary" size="md" iconEnd="arrowRight" onClick={submit}>
                   {t.footer.newsletterCta}
                 </Button>
               </form>
@@ -274,20 +297,11 @@ export function Footer({ t, navigate }) {
           </div>
         </div>
 
-        <div
-          style={{
-            marginTop: 56,
-            paddingTop: 24,
-            borderTop: "1px solid rgba(255,255,255,0.1)",
-            display: "flex",
-            flexWrap: "wrap",
-            gap: 12,
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <span style={{ fontSize: 13, color: "rgba(255,255,255,0.66)" }}>{t.footer.legal}</span>
-          <span className="t-mono" style={{ fontSize: 12, color: "rgba(255,255,255,0.6)" }}>
+        {/* Bottom bar */}
+        <div className="ftr-bottom">
+          <span className="ftr-legal">{t.footer.legal}</span>
+          <span className="t-mono ftr-sig">
+            <span className="ftr-dot" aria-hidden="true" />
             Caastor v2 · caastor.co
           </span>
         </div>

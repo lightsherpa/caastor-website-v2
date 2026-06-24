@@ -6,6 +6,7 @@ import { Avatar } from "../ds/components.jsx";
 import { FinalCTA } from "../components/FinalCTA.jsx";
 import { BlockRenderer } from "../blog/BlockRenderer.jsx";
 import { fetchPostBySlug } from "../lib/blog.js";
+import "./blog-extra.css";
 
 const COPY = {
   en: { back: "All posts", notFound: "We couldn’t find that post.", by: "By" },
@@ -76,41 +77,42 @@ export function BlogPostPage({ t, lang, slug, navigate }) {
           <div className="hero-blobs">
             <span className="blob a" />
           </div>
-          <div className="container container-narrow" style={{ position: "relative", zIndex: 1, padding: "72px 28px 36px" }}>
+          <div className="container container-narrow bx-post-head" style={{ padding: "72px 28px 36px" }}>
             <Reveal>
-              <span className="text-link" style={{ cursor: "pointer", fontSize: 14, marginBottom: 22, display: "inline-flex" }} onClick={() => navigate("blog")}>
+              <span className="text-link bx-back" onClick={() => navigate("blog")}>
                 <Icon name="chevronLeft" size={15} /> {c.back}
               </span>
             </Reveal>
             <Reveal delay={60}>
-              <div className="blog-card-meta" style={{ marginBottom: 16 }}>
+              <div className="bx-post-meta">
                 {(post.tags || []).map((tag) => (
-                  <span key={tag} className="blog-tag">
+                  <span key={tag} className="bx-tag">
                     {tag}
                   </span>
                 ))}
+                <span className="bx-dot" />
                 <span>{fmtDate(post.published_at, lang)}</span>
               </div>
             </Reveal>
             <Reveal delay={100}>
-              <h1 className="t-display-md balance" style={{ marginBottom: 22 }}>
+              <h1 className="t-display-md balance bx-post-title">
                 {post.title}
               </h1>
             </Reveal>
             {post.excerpt && (
               <Reveal delay={140}>
-                <p className="pretty" style={{ fontSize: 20, lineHeight: "31px", color: "var(--text-secondary)", maxWidth: 680 }}>
+                <p className="pretty bx-post-lede">
                   {post.excerpt}
                 </p>
               </Reveal>
             )}
             {post.author && (
               <Reveal delay={180}>
-                <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 24 }}>
+                <div className="bx-author">
                   <Avatar name={post.author} size={40} />
                   <div>
-                    <div style={{ fontWeight: 700, fontSize: 14 }}>{post.author}</div>
-                    <div style={{ fontSize: 13, color: "var(--text-tertiary)" }}>{c.by} Caastor</div>
+                    <div className="bx-author-name">{post.author}</div>
+                    <div className="bx-author-role">{c.by} Caastor</div>
                   </div>
                 </div>
               </Reveal>
@@ -121,20 +123,18 @@ export function BlogPostPage({ t, lang, slug, navigate }) {
         {post.cover_url && (
           <div className="container container-narrow" style={{ marginTop: 8, marginBottom: 8 }}>
             <Reveal>
-              <img
-                src={post.cover_url}
-                alt={post.title}
-                style={{ width: "100%", borderRadius: 18, boxShadow: "var(--shadow-lg)", display: "block", aspectRatio: "16/9", objectFit: "cover" }}
-              />
+              <img className="bx-cover-hero" src={post.cover_url} alt={post.title} />
             </Reveal>
           </div>
         )}
 
         <section className="section-sm surface-canvas">
           <div className="container container-narrow">
-            <Reveal>
-              <BlockRenderer blocks={post.blocks} navigate={navigate} />
-            </Reveal>
+            <div className="bx-reading">
+              <Reveal>
+                <BlockRenderer blocks={post.blocks} navigate={navigate} />
+              </Reveal>
+            </div>
           </div>
         </section>
       </article>
