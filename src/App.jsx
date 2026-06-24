@@ -25,15 +25,15 @@ const AdminApp = lazy(() => import("./admin/AdminApp.jsx").then((m) => ({ defaul
 // Per-route document titles + meta descriptions (bilingual). Keyed by route.
 const PAGE_META = {
   home: {
-    en: { title: "Caastor · Growth systems for modern teams", desc: "Caastor builds growth systems, automation, and AI workflows for modern teams." },
-    es: { title: "Caastor · Sistemas de crecimiento para equipos modernos", desc: "Caastor crea sistemas de crecimiento, automatización y flujos de IA para equipos modernos." },
+    en: { title: "Caastor · Creative as a Service", desc: "Your on-demand design team. Unlimited design requests, senior work, shipped in 48 hours, one flat monthly fee." },
+    es: { title: "Caastor · Creatividad como servicio", desc: "Tu equipo de diseño a demanda. Peticiones ilimitadas, nivel senior, entregado en 48 horas y una tarifa plana al mes." },
   },
   services: {
     en: { title: "Services · Caastor", desc: "Explore Caastor's services and how we help your team grow." },
     es: { title: "Servicios · Caastor", desc: "Explora los servicios de Caastor y cómo ayudamos a tu equipo a crecer." },
   },
   pricing: {
-    en: { title: "Pricing · Caastor", desc: "Simple, transparent pricing for Caastor's growth systems." },
+    en: { title: "Pricing · Caastor", desc: "Simple, transparent pricing for Caastor's design subscription." },
     es: { title: "Precios · Caastor", desc: "Precios simples y transparentes para los sistemas de crecimiento de Caastor." },
   },
   about: {
