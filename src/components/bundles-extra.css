@@ -74,7 +74,9 @@
 }
 .bx-card.is-feature .bx-name,
 .bx-card.is-feature .bx-price-amount {
-  color: var(--text-on-brand, #fff);
+  /* Permanently-dark surface: force light text (--text-on-brand is near-black
+     in BOTH themes, which renders invisible here). */
+  color: #fff;
 }
 .bx-card.is-feature .bx-for,
 .bx-card.is-feature .bx-desc {
@@ -152,6 +154,14 @@
   display: flex;
   align-items: center;
   margin-bottom: 6px;
+}
+/* Reserve clear space for the floating "Most popular" ribbon (top-right,
+   absolutely positioned) so the bundle name never runs under it. */
+.bx-card:has(.bx-ribbon) .bx-top {
+  padding-top: 22px;
+}
+.bx-card:has(.bx-ribbon) .bx-name-row {
+  padding-right: 124px;
 }
 .bx-name {
   font-size: 21px;

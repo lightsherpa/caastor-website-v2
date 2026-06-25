@@ -15,7 +15,7 @@ export function ContactPage({ t }) {
           <span className="blob b" />
         </div>
         <div className="container" style={{ position: "relative", zIndex: 1, padding: "84px 28px 88px" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) minmax(0,1fr)", gap: 56, alignItems: "start" }} className="hero-grid">
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 340px), 1fr))", gap: 56, alignItems: "start" }} className="hero-grid">
             {/* left: intro + expectations */}
             <div>
               <Reveal>
@@ -56,7 +56,7 @@ export function ContactPage({ t }) {
               <div
                 style={{
                   position: "relative",
-                  background: "var(--bg-canvas)",
+                  background: "var(--bg-elevated)",
                   border: "1px solid var(--border-default)",
                   borderRadius: 24,
                   boxShadow: "var(--shadow-lg)",

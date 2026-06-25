@@ -24,7 +24,7 @@
   position: absolute;
   left: 4px;
   right: 4px;
-  top: 21px; /* aligns with node centers (node = 42px) */
+  top: 20px; /* aligns with node centers (node = 42px → center 21px) */
   height: 2px;
   background: linear-gradient(
     to right,
@@ -188,6 +188,20 @@
 .cstr-hero__quote-text {
   font-size: 19px;
   line-height: 24px;
+}
+
+/* Hero grid: the 2-col layout is set inline on .hero-grid with no
+   responsive collapse, so it crushes on narrow viewports. Stack it and
+   pull the floating quote card back inside the frame on smaller screens. */
+@media (max-width: 860px) {
+  .hero-grid {
+    grid-template-columns: 1fr !important;
+    gap: 40px !important;
+  }
+  .cstr-hero__quote {
+    left: 12px;
+    bottom: -16px;
+  }
 }
 
 /* Mission band: framed quote on a soft branded surface. */

@@ -89,6 +89,13 @@
   border-radius: 16px;
 }
 
+/* When open, the question row's bottom edge is square (answer continues
+   below), so keep the focus ring's bottom corners square to match. */
+.fx-item.is-open .fx-q:focus-visible {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
 .fx-q-text {
   font-size: 17px;
   line-height: 26px;

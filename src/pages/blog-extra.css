@@ -125,11 +125,13 @@
   color: var(--text-tertiary);
   font-weight: 600;
 }
-.bx-meta .bx-dot {
+.bx-meta .bx-dot,
+.bx-post-meta .bx-dot {
   width: 3px;
   height: 3px;
   border-radius: 50%;
   background: var(--text-quaternary);
+  flex: none;
 }
 .bx-tag {
   display: inline-flex;

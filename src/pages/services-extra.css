@@ -147,11 +147,15 @@
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.02em;
-  color: var(--text-secondary);
+  /* --brand-soft / --accent-soft are permanently-light surfaces (not
+     overridden in dark theme), so the label must use a dark-on-light color
+     in BOTH themes. --text-secondary is light in dark mode → unreadable. */
+  color: var(--text-on-brand);
 }
 
 .svc-card--accent .svc-tag {
   background: var(--accent-soft);
+  color: var(--text-on-brand);
 }
 
 .svc-tag-dot {
@@ -212,7 +216,11 @@
 
 .svc-card--accent .svc-line-mark--solution {
   background: var(--accent);
-  color: var(--text-inverse);
+  /* --accent is a saturated mid/dark hue in every palette/theme; the check
+     glyph needs a consistently light fill. --text-inverse flips to near-black
+     in dark theme (low contrast on dark-teal/indigo accents), so use the
+     purpose-built --text-on-accent (#FFFFFF in both themes) instead. */
+  color: var(--text-on-accent);
 }
 
 .svc-line-text {

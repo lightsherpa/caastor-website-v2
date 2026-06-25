@@ -93,11 +93,6 @@ function PlanCard({ plan, p, navigate, yearly, lang }) {
       <div className="prc-head">
         <div className="prc-sku-row">
           <span className="prc-sku">{plan.sku}</span>
-          {isPop && (
-            <Badge tone="brand" dot>
-              {p.popular}
-            </Badge>
-          )}
         </div>
 
         <div className="prc-price-row">

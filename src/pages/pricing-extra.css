@@ -39,6 +39,10 @@
 .pr-seg-btn {
   position: relative;
   z-index: 1;
+  /* Equal-width halves so the 50%-wide sliding thumb sits flush under the
+     active label regardless of label length (e.g. "Mensual" vs "Anual"). */
+  flex: 1 1 0;
+  text-align: center;
   appearance: none;
   border: 0;
   background: transparent;
@@ -170,6 +174,12 @@
   .prc-card.is-popular,
   .prc-card.is-popular:hover {
     transform: translateY(0);
+  }
+  /* No lift at this breakpoint, so the floating ribbon (top: -13px) would
+     reach up into the row gap toward the card above. Add clearance so it
+     can't collide with the neighbouring card in the 2-column layout. */
+  .prc-card.is-popular {
+    margin-top: 13px;
   }
 }
 
