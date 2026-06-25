@@ -1,8 +1,10 @@
 /* Caastor v2 — Services page */
+import { useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { Button, Card } from "../ds/components.jsx";
 import { Reveal, Eyebrow } from "../components/shell.jsx";
 import { FinalCTA } from "../components/FinalCTA.jsx";
+import { EASE, SPRING } from "../motion/tokens.js";
 import "./services-extra.css";
 
 /* ──────────────────────────────────────────────────────────────────
@@ -12,11 +14,22 @@ import "./services-extra.css";
    every animation guarded by useReducedMotion(). Theme vars only.
    ────────────────────────────────────────────────────────────────── */
 
-const EASE = [0.22, 0.61, 0.36, 1];
 const loop = (extra = {}) => ({ repeat: Infinity, ease: "easeInOut", ...extra });
 
+/* Follow-through stagger for a card's internals: eyebrow -> visual ->
+   title -> body. Children settle with a soft spring overshoot rather than
+   stopping dead. Reduced-motion swaps to a no-op (handled at call site). */
+const cardStagger = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.07, delayChildren: 0.04 } },
+};
+const cardChild = {
+  hidden: { opacity: 0, y: 14 },
+  show: { opacity: 1, y: 0, transition: SPRING.soft },
+};
+
 /* 0 · Brand & identity — a mark assembling from rotating brand tokens. */
-function BrandVisual({ reduce }) {
+function BrandVisual({ reduce, hovered }) {
   const ringT = loop({ duration: 14, ease: "linear" });
   return (
     <svg viewBox="0 0 120 88" className="svc-svg" role="img" aria-hidden>
@@ -54,8 +67,8 @@ function BrandVisual({ reduce }) {
         cy="44"
         r="5"
         fill="var(--brand)"
-        animate={reduce ? undefined : { scale: [1, 1.25, 1] }}
-        transition={reduce ? undefined : loop({ duration: 3 })}
+        animate={reduce ? undefined : { scale: hovered ? 1.4 : [1, 1.25, 1] }}
+        transition={reduce ? undefined : hovered ? SPRING.bouncy : loop({ duration: 3 })}
         style={{ transformOrigin: "60px 44px" }}
       />
     </svg>
@@ -63,7 +76,7 @@ function BrandVisual({ reduce }) {
 }
 
 /* 1 · Web & UI/UX — a browser frame whose blocks lay themselves out. */
-function WebVisual({ reduce }) {
+function WebVisual({ reduce, hovered }) {
   const bars = [
     { w: 54, c: "var(--brand)", d: 0 },
     { w: 34, c: "var(--bg-muted)", d: 0.25 },
@@ -74,7 +87,16 @@ function WebVisual({ reduce }) {
       <rect x="14" y="14" width="92" height="60" rx="8" fill="var(--bg-app)" stroke="var(--border-default)" strokeWidth="1.6" />
       <line x1="14" y1="28" x2="106" y2="28" stroke="var(--border-default)" strokeWidth="1.4" />
       {[24, 30, 36].map((cx, i) => (
-        <circle key={cx} cx={cx} cy="21" r="2" fill={i === 0 ? "var(--accent)" : "var(--text-quaternary)"} />
+        <motion.circle
+          key={cx}
+          cx={cx}
+          cy="21"
+          r="2"
+          fill={i === 0 ? "var(--accent)" : "var(--text-quaternary)"}
+          animate={reduce ? undefined : { scale: hovered && i === 0 ? 1.5 : 1 }}
+          transition={reduce ? undefined : SPRING.bouncy}
+          style={{ transformOrigin: `${cx}px 21px` }}
+        />
       ))}
       {bars.map((b, i) => (
         <motion.rect
@@ -100,7 +122,7 @@ function WebVisual({ reduce }) {
 }
 
 /* 2 · Social & content — a feed card with a beating like + rising reach. */
-function SocialVisual({ reduce }) {
+function SocialVisual({ reduce, hovered }) {
   return (
     <svg viewBox="0 0 120 88" className="svc-svg" role="img" aria-hidden>
       <rect x="22" y="16" width="76" height="56" rx="9" fill="var(--bg-app)" stroke="var(--border-default)" strokeWidth="1.6" />
@@ -123,8 +145,8 @@ function SocialVisual({ reduce }) {
       <motion.path
         d="M82 60 c0 -3 4 -4 5 -1 c1 -3 5 -2 5 1 c0 3 -5 6 -5 6 s-5 -3 -5 -6 Z"
         fill="var(--accent)"
-        animate={reduce ? undefined : { scale: [1, 1.3, 1] }}
-        transition={reduce ? undefined : loop({ duration: 1.4 })}
+        animate={reduce ? undefined : { scale: hovered ? 1.55 : [1, 1.3, 1] }}
+        transition={reduce ? undefined : hovered ? SPRING.bouncy : loop({ duration: 1.4 })}
         style={{ transformOrigin: "87px 63px" }}
       />
     </svg>
@@ -132,7 +154,7 @@ function SocialVisual({ reduce }) {
 }
 
 /* 3 · Graphic & layout — grid columns + a chart bar that grows. */
-function GraphicVisual({ reduce }) {
+function GraphicVisual({ reduce, hovered }) {
   const cols = [
     { x: 24, h: 22, c: "var(--bg-muted)", d: 0 },
     { x: 40, h: 34, c: "var(--brand)", d: 0.15 },
@@ -162,8 +184,14 @@ function GraphicVisual({ reduce }) {
         stroke="var(--brand-strong)"
         strokeWidth="1.6"
         strokeDasharray="3 4"
-        animate={reduce ? { y1: 40, y2: 40 } : { y1: [50, 34, 50], y2: [50, 34, 50] }}
-        transition={reduce ? undefined : loop({ duration: 4 })}
+        animate={
+          reduce
+            ? { y1: 40, y2: 40 }
+            : hovered
+            ? { y1: 28, y2: 28 }
+            : { y1: [50, 34, 50], y2: [50, 34, 50] }
+        }
+        transition={reduce ? undefined : hovered ? SPRING.snappy : loop({ duration: 4 })}
       />
     </svg>
   );
@@ -172,9 +200,88 @@ function GraphicVisual({ reduce }) {
 const VISUALS = [BrandVisual, WebVisual, SocialVisual, GraphicVisual];
 const ICON_TO_VISUAL = { star: BrandVisual, grid: WebVisual, message: SocialVisual, layers: GraphicVisual };
 
-function ServiceVisual({ index, icon, reduce }) {
+function ServiceVisual({ index, icon, reduce, hovered }) {
   const Visual = VISUALS[index] || ICON_TO_VISUAL[icon] || BrandVisual;
-  return <Visual reduce={reduce} />;
+  return <Visual reduce={reduce} hovered={hovered} />;
+}
+
+/* One service card. Holds its own hover state so the animated visual can
+   react (secondary action) and the media panel lifts with anticipation.
+   Internals reveal in a follow-through cascade (tag -> visual -> title ->
+   body) via the stagger variants. All motion is reduced-motion guarded. */
+function ServiceCard({ it, index, accent, reduce, labels }) {
+  const [hovered, setHovered] = useState(false);
+  const { problem, solution } = splitBody(it.body);
+
+  // Reduced motion: render plain children with no variants/stagger.
+  const stagger = reduce ? undefined : cardStagger;
+  const child = reduce ? undefined : cardChild;
+  const mv = reduce ? {} : { variants: stagger, initial: "hidden", whileInView: "show", viewport: { once: true, margin: "0px 0px -12% 0px" } };
+  const cv = reduce ? {} : { variants: child };
+
+  return (
+    <Card padded={28} hover className={"svc-card" + (accent ? " svc-card--accent" : "")} style={{ height: "100%" }}>
+      <motion.div
+        {...mv}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        style={{ display: "flex", flexDirection: "column", height: "100%" }}
+      >
+        {/* S-1 — animated, branded visual per discipline. On hover the
+            panel lifts (anticipation) and a CHILD in the figure reacts. */}
+        <motion.div
+          className="svc-media"
+          {...cv}
+          animate={reduce ? undefined : { y: hovered ? -4 : 0 }}
+          transition={reduce ? undefined : SPRING.soft}
+        >
+          <span className="svc-media-grid" aria-hidden />
+          <span className="svc-num">0{index + 1}</span>
+          <ServiceVisual index={index} icon={it.icon} reduce={reduce} hovered={hovered} />
+          <span className="svc-media-sheen" aria-hidden />
+        </motion.div>
+
+        <motion.span className="svc-tag" {...cv}>
+          <span className="svc-tag-dot" aria-hidden />
+          {it.tag || it.title}
+        </motion.span>
+
+        <motion.h3 className="t-h2 balance svc-title" {...cv}>
+          {it.title}
+        </motion.h3>
+
+        {/* S-2 — render the bound body as a problem → solution split;
+            the full `it.body` data is the source. */}
+        <motion.div className="svc-body" {...cv}>
+          {problem && (
+            <div className="svc-line svc-line--problem">
+              <span className="svc-line-mark svc-line-mark--problem" aria-hidden>
+                ✕
+              </span>
+              <span className="svc-connector" aria-hidden />
+              <p className="svc-line-text">
+                <span className="t-mono" style={{ fontSize: 11, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--text-quaternary)", display: "block", marginBottom: 3 }}>
+                  {labels.problem}
+                </span>
+                {problem}
+              </p>
+            </div>
+          )}
+          <div className="svc-line svc-line--solution">
+            <span className="svc-line-mark svc-line-mark--solution" aria-hidden>
+              ✓
+            </span>
+            <p className="svc-line-text">
+              <span className="t-mono" style={{ fontSize: 11, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--text-quaternary)", display: "block", marginBottom: 3 }}>
+                {labels.solution}
+              </span>
+              {solution}
+            </p>
+          </div>
+        </motion.div>
+      </motion.div>
+    </Card>
+  );
 }
 
 /* Split the one-sentence body into a problem (first sentence) and the
@@ -253,56 +360,9 @@ export function ServicesPage({ t, navigate }) {
           <div className="grid grid-2">
             {s.items.map((it, i) => {
               const accent = i % 2 === 1;
-              const { problem, solution } = splitBody(it.body);
               return (
                 <Reveal key={i} delay={(i % 2) * 90}>
-                  <Card padded={28} hover className={"svc-card" + (accent ? " svc-card--accent" : "")} style={{ height: "100%" }}>
-                    {/* S-1 — animated, branded visual per discipline in a
-                        full-width media panel with depth + hover sheen. */}
-                    <div className="svc-media">
-                      <span className="svc-media-grid" aria-hidden />
-                      <span className="svc-num">0{i + 1}</span>
-                      <ServiceVisual index={i} icon={it.icon} reduce={reduce} />
-                      <span className="svc-media-sheen" aria-hidden />
-                    </div>
-
-                    <span className="svc-tag">
-                      <span className="svc-tag-dot" aria-hidden />
-                      {it.tag || it.title}
-                    </span>
-
-                    <h3 className="t-h2 balance svc-title">{it.title}</h3>
-
-                    {/* S-2 — render the bound body as a problem → solution
-                        split; the full `it.body` data is the source. */}
-                    <div className="svc-body">
-                      {problem && (
-                        <div className="svc-line svc-line--problem">
-                          <span className="svc-line-mark svc-line-mark--problem" aria-hidden>
-                            ✕
-                          </span>
-                          <span className="svc-connector" aria-hidden />
-                          <p className="svc-line-text">
-                            <span className="t-mono" style={{ fontSize: 11, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--text-quaternary)", display: "block", marginBottom: 3 }}>
-                              {labels.problem}
-                            </span>
-                            {problem}
-                          </p>
-                        </div>
-                      )}
-                      <div className="svc-line svc-line--solution">
-                        <span className="svc-line-mark svc-line-mark--solution" aria-hidden>
-                          ✓
-                        </span>
-                        <p className="svc-line-text">
-                          <span className="t-mono" style={{ fontSize: 11, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--text-quaternary)", display: "block", marginBottom: 3 }}>
-                            {labels.solution}
-                          </span>
-                          {solution}
-                        </p>
-                      </div>
-                    </div>
-                  </Card>
+                  <ServiceCard it={it} index={i} accent={accent} reduce={reduce} labels={labels} />
                 </Reveal>
               );
             })}

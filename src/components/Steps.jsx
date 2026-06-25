@@ -8,10 +8,17 @@ import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useReducedMotion, useInView } from "motion/react";
 import { Icon } from "../ds/components.jsx";
 import { Reveal, SectionHead } from "./shell.jsx";
+import { EASE, DUR, SPRING } from "../motion/tokens.js";
 
 const ROTATE = 4400; // ms per step — matches the CSS progress animation
 
-const EASE = [0.22, 0.61, 0.36, 1];
+/* Follow-through child: rises + settles on a soft spring (overshoots, then
+   eases home) so the cascade feels alive instead of snapping into place. */
+const copyChild = {
+  hidden: { opacity: 0, y: 14 },
+  show: { opacity: 1, y: 0, transition: SPRING.soft },
+  exit: { opacity: 0, y: -10, transition: { duration: DUR.fast, ease: EASE.out } },
+};
 
 /* ── Per-step media: a real platform screenshot in a browser frame,
    with a live floating annotation that reinforces the step.
@@ -134,7 +141,15 @@ export function StepsSection({ t, lang }) {
                 onClick={() => setActive(i)}
                 aria-current={i === active}
               >
-                <span className="steps-pill-dot">{i < active ? <Icon name="check" size={13} /> : i + 1}</span>
+                {/* SECONDARY reaction: the dot of the freshly-activated pill
+                   gives a quick spring pop (anticipation dip -> overshoot). */}
+                <motion.span
+                  className="steps-pill-dot"
+                  animate={i === active ? { scale: [0.86, 1.18, 1] } : { scale: 1 }}
+                  transition={i === active ? SPRING.bouncy : { duration: DUR.fast, ease: EASE.out }}
+                >
+                  {i < active ? <Icon name="check" size={13} /> : i + 1}
+                </motion.span>
                 <span className="steps-pill-label">{s.title}</span>
               </button>
             ))}
@@ -143,18 +158,41 @@ export function StepsSection({ t, lang }) {
           {/* focus panel */}
           <div className="steps-panel">
             <div className="steps-copy">
-              <span className="steps-ghost" aria-hidden="true">{steps[active].n}</span>
+              {/* Ghost numeral — SECONDARY reaction: on each activation it
+                 anticipates (dips) then springs up with a touch of overshoot. */}
+              <motion.span
+                key={"ghost-" + active}
+                className="steps-ghost"
+                aria-hidden="true"
+                initial={{ scale: 0.92, opacity: 0 }}
+                animate={{ scale: [0.92, 0.97, 1], opacity: [0, 0.4, 1] }}
+                transition={{ duration: DUR.slow, ease: EASE.emphasized, times: [0, 0.35, 1] }}
+              >
+                {steps[active].n}
+              </motion.span>
               <AnimatePresence mode="wait">
+                {/* Follow-through: number -> title -> body cascade in, each
+                   settling on a soft spring rather than stopping dead. */}
                 <motion.div
                   key={active}
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -12 }}
-                  transition={{ duration: 0.4, ease: EASE }}
+                  initial="hidden"
+                  animate="show"
+                  exit="exit"
+                  variants={{
+                    hidden: {},
+                    show: { transition: { staggerChildren: 0.07, delayChildren: 0.04 } },
+                    exit: { transition: { staggerChildren: 0.04, staggerDirection: -1 } },
+                  }}
                 >
-                  <span className="steps-step-n">{lang === "es" ? "Paso" : "Step"} {steps[active].n}</span>
-                  <h3 className="t-h2 steps-step-title">{steps[active].title}</h3>
-                  <p className="pretty steps-step-body">{steps[active].body}</p>
+                  <motion.span className="steps-step-n" variants={copyChild}>
+                    {lang === "es" ? "Paso" : "Step"} {steps[active].n}
+                  </motion.span>
+                  <motion.h3 className="t-h2 steps-step-title" variants={copyChild}>
+                    {steps[active].title}
+                  </motion.h3>
+                  <motion.p className="pretty steps-step-body" variants={copyChild}>
+                    {steps[active].body}
+                  </motion.p>
                 </motion.div>
               </AnimatePresence>
               <div className="steps-progress">
@@ -170,7 +208,7 @@ export function StepsSection({ t, lang }) {
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -22 }}
-                  transition={{ duration: 0.5, ease: EASE }}
+                  transition={{ duration: 0.5, ease: EASE.out }}
                 >
                   <StepShot active={active} lang={lang} />
                 </motion.div>

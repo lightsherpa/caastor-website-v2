@@ -7,9 +7,11 @@
    scrolling testimonial wall — layout/motion idea rebuilt here in our
    JSX + design tokens (no external code reused).
    ────────────────────────────────────────────────────────────────── */
+import { motion, useReducedMotion } from "motion/react";
 import { Card, Avatar } from "../ds/components.jsx";
 import { Reveal, SectionHead } from "../components/shell.jsx";
 import { Marquee } from "../motion/primitives.jsx";
+import { SPRING } from "../motion/tokens.js";
 import "./testimonials.css";
 
 /* Pull the company name (after the comma in role, e.g. "CEO, Geoking"). */
@@ -63,8 +65,25 @@ function Person({ name, role, photo, size = 40, idx = 0 }) {
   );
 }
 
+/* Hover-driven variants for the featured card. Parent "rest"/"hover" states
+   propagate to children, so a secondary reaction (quotemark swells + tilts,
+   metric ticks up) follows the card's lift instead of stopping dead. */
+const LEAD = {
+  rest: { y: 0 },
+  hover: { y: -6, transition: { ...SPRING.soft, staggerChildren: 0.04 } },
+};
+const LEAD_QUOTEMARK = {
+  rest: { scale: 1, rotate: 0, opacity: 1 },
+  hover: { scale: 1.14, rotate: -5, opacity: 1, transition: { ...SPRING.bouncy } },
+};
+const LEAD_METRIC = {
+  rest: { scale: 1, y: 0 },
+  hover: { scale: 1.05, y: -2, transition: { ...SPRING.soft } },
+};
+
 export function Testimonials({ t }) {
   const h = t.home;
+  const reduce = useReducedMotion();
   const quotes = h.testimonials.quotes || [];
   if (!quotes.length) return null;
 
@@ -84,14 +103,30 @@ export function Testimonials({ t }) {
           <div className="tw-wrap">
             <div className="tw-grid">
               {/* ── Featured lead testimonial ── */}
-              <article className="tw-lead">
-                <div className="tw-lead-quotemark" aria-hidden>
+              <motion.article
+                className="tw-lead"
+                variants={reduce ? undefined : LEAD}
+                initial="rest"
+                animate="rest"
+                whileHover={reduce ? undefined : "hover"}
+                style={{ willChange: "transform" }}
+              >
+                <motion.div
+                  className="tw-lead-quotemark"
+                  aria-hidden
+                  variants={reduce ? undefined : LEAD_QUOTEMARK}
+                  style={{ transformOrigin: "0% 100%" }}
+                >
                   &ldquo;
-                </div>
-                <div className="tw-lead-metric">
+                </motion.div>
+                <motion.div
+                  className="tw-lead-metric"
+                  variants={reduce ? undefined : LEAD_METRIC}
+                  style={{ transformOrigin: "0% 100%" }}
+                >
                   <span className="tw-lead-metric-v">{lead.metric}</span>
                   <span className="tw-lead-metric-l">{lead.metricLabel}</span>
-                </div>
+                </motion.div>
                 <p className="tw-lead-quote balance">{lead.quote}</p>
                 <div className="tw-lead-person">
                   <Person
@@ -102,7 +137,7 @@ export function Testimonials({ t }) {
                     idx={0}
                   />
                 </div>
-              </article>
+              </motion.article>
 
               {/* ── Marquee wall ── */}
               <div className="tw-wall">

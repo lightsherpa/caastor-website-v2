@@ -67,11 +67,13 @@ a { color: inherit; text-decoration: none; }
 .nav-ic { display: inline-flex; align-items: center; color: var(--text-tertiary); transition: color var(--dur-base) var(--ease-out); }
 .nav-link:hover .nav-ic { color: var(--brand-strong); }
 .nav-ic.on { color: var(--brand-strong); animation: navBounce 0.5s var(--ease-out); }
+/* bounce with squash & stretch: stretch up off the top, squash on landing */
 @keyframes navBounce {
-  0%, 100% { transform: translateY(0); }
-  30% { transform: translateY(-4px); }
-  55% { transform: translateY(0); }
-  78% { transform: translateY(-2px); }
+  0%   { transform: translateY(0) scale(1, 1); }
+  20%  { transform: translateY(-5px) scale(0.92, 1.1); }
+  45%  { transform: translateY(0) scale(1.12, 0.88); }
+  65%  { transform: translateY(-2px) scale(0.97, 1.04); }
+  100% { transform: translateY(0) scale(1, 1); }
 }
 @media (prefers-reduced-motion: reduce) { .nav-ic.on { animation: none; } }
 

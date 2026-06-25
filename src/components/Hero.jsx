@@ -15,7 +15,8 @@
 import { Button, Icon } from "../ds/components.jsx";
 import { Reveal, Eyebrow } from "./shell.jsx";
 import { ScrollTilt, HeroHeadline, SlotWord, MagneticCursor } from "../motion/primitives.jsx";
-import { useReducedMotion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
+import { EASE, DUR, SPRING } from "../motion/tokens.js";
 import { HeroCanvas } from "../motion/HeroCanvas.jsx";
 import { PlatformMock } from "./PlatformMock.jsx";
 import { bookingProps } from "../lib/booking.js";
@@ -43,6 +44,38 @@ function HeroVisual({ lang, reduce }) {
           cta: "Book a demo",
           shipped: "Shipped this week",
         };
+
+  /* ── Chip ENTRANCE (inner layer): arrive along a gentle ARC — the keyframed
+     x/y bow the path outward instead of a straight pop-in — then settle with a
+     soft-spring overshoot (follow-through), so it doesn't stop dead. ── */
+  const chipEnter = (dx, dy, bow, delay) =>
+    reduce
+      ? {}
+      : {
+          initial: { opacity: 0, x: dx, y: dy, scale: 0.92 },
+          animate: { opacity: 1, x: [dx, bow, 0], y: [dy, dy * 0.42, 0], scale: 1 },
+          transition: {
+            opacity: { duration: DUR.base, ease: EASE.out, delay },
+            x: { duration: 0.66, ease: EASE.emphasized, delay },
+            y: { duration: 0.66, ease: EASE.emphasized, delay },
+            scale: { ...SPRING.soft, delay },
+          },
+        };
+
+  /* ── Chip IDLE (outer layer): drift along a gentle curve (x and y out of
+     phase trace an arc, not a straight bob). Kept on its own element so it
+     composes with — instead of fighting — the entrance transform. ── */
+  const chipIdle = (ax, ay, dur, delay) =>
+    reduce
+      ? {}
+      : {
+          animate: {
+            x: [0, ax, ax * 0.3, -ax * 0.5, 0],
+            y: [0, -ay, ay * 0.4, -ay * 0.7, 0],
+          },
+          transition: { duration: dur, ease: EASE.inOut, repeat: Infinity, delay },
+        };
+
   return (
     <div
       style={{ position: "relative", transformStyle: "preserve-3d", cursor: "pointer" }}
@@ -64,52 +97,86 @@ function HeroVisual({ lang, reduce }) {
         {!reduce && <div className="cst-hero-sheen" aria-hidden="true" />}
       </div>
 
-      {/* floating draft-ready toast (front layer) */}
-      <div
-        className="hero-float"
-        style={{ left: -26, bottom: -26, transform: "translateZ(55px)", display: "flex", alignItems: "center", gap: 12 }}
-      >
-        <div style={{ width: 34, height: 34, borderRadius: 9, background: "var(--status-success-soft)", color: "var(--status-success)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-          <Icon name="check" size={18} />
-        </div>
-        <div style={{ whiteSpace: "nowrap" }}>
-          <div style={{ fontSize: 13, fontWeight: 700 }}>{L.draft}</div>
-          <div style={{ fontSize: 12, color: "var(--text-tertiary)" }}>{L.ago}</div>
-        </div>
+      {/* floating draft-ready toast (front layer).
+         Outer div keeps the 3D translateZ (untouched by motion); the idle and
+         entrance transforms live on nested motion layers so they compose with
+         the Z-depth instead of overwriting it. */}
+      <div style={{ position: "absolute", left: -26, bottom: -26, transform: "translateZ(55px)" }}>
+        <motion.div {...chipIdle(5, 8, 7, 1.2)}>
+          <motion.div
+            className="hero-float"
+            style={{ display: "flex", alignItems: "center", gap: 12 }}
+            {...chipEnter(-22, 26, -8, 0.35)}
+          >
+            <div style={{ width: 34, height: 34, borderRadius: 9, background: "var(--status-success-soft)", color: "var(--status-success)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              <Icon name="check" size={18} />
+            </div>
+            <div style={{ whiteSpace: "nowrap" }}>
+              <div style={{ fontSize: 13, fontWeight: 700 }}>{L.draft}</div>
+              <div style={{ fontSize: 12, color: "var(--text-tertiary)" }}>{L.ago}</div>
+            </div>
+          </motion.div>
+        </motion.div>
       </div>
 
       {/* floating turnaround chip (front layer) */}
-      <div
-        className="hero-float"
-        style={{ left: -34, top: 64, transform: "translateZ(78px)", display: "flex", alignItems: "center", gap: 9, padding: "9px 13px" }}
-      >
-        <span style={{ width: 8, height: 8, borderRadius: 999, background: "var(--brand)", boxShadow: "0 0 0 4px rgba(var(--brand-glow),0.18)" }} />
-        <span style={{ fontSize: 13, fontWeight: 700, whiteSpace: "nowrap" }}>{L.fast}</span>
+      <div style={{ position: "absolute", left: -34, top: 64, transform: "translateZ(78px)" }}>
+        <motion.div {...chipIdle(-6, 7, 8.4, 0.4)}>
+          <motion.div
+            className="hero-float"
+            style={{ display: "flex", alignItems: "center", gap: 9, padding: "9px 13px" }}
+            {...chipEnter(-26, 18, -10, 0.5)}
+          >
+            <span style={{ width: 8, height: 8, borderRadius: 999, background: "var(--brand)", boxShadow: "0 0 0 4px rgba(var(--brand-glow),0.18)" }} />
+            <span style={{ fontSize: 13, fontWeight: 700, whiteSpace: "nowrap" }}>{L.fast}</span>
+          </motion.div>
+        </motion.div>
       </div>
 
       {/* floating live-metric chip (right edge, front layer) */}
-      <div
-        className="hero-float cst-hero-metric"
-        style={{ right: -30, bottom: 52, transform: "translateZ(66px)" }}
-      >
-        <span className="cst-hero-metric-spark" aria-hidden="true">
-          <i style={{ height: "55%" }} />
-          <i style={{ height: "85%" }} />
-          <i style={{ height: "40%" }} />
-          <i style={{ height: "100%" }} />
-        </span>
-        <div style={{ whiteSpace: "nowrap" }}>
-          <div style={{ fontSize: 15, fontWeight: 800, lineHeight: 1 }}>+18</div>
-          <div style={{ fontSize: 11, color: "var(--text-tertiary)", marginTop: 3 }}>{L.shipped}</div>
-        </div>
+      <div style={{ position: "absolute", right: -30, bottom: 52, transform: "translateZ(66px)" }}>
+        <motion.div {...chipIdle(6, 9, 7.8, 1.7)}>
+          <motion.div
+            className="hero-float cst-hero-metric"
+            {...chipEnter(28, 22, 10, 0.62)}
+          >
+            <span className="cst-hero-metric-spark" aria-hidden="true">
+              <i style={{ height: "55%" }} />
+              <i style={{ height: "85%" }} />
+              <i style={{ height: "40%" }} />
+              <i style={{ height: "100%" }} />
+            </span>
+            <div style={{ whiteSpace: "nowrap" }}>
+              <div style={{ fontSize: 15, fontWeight: 800, lineHeight: 1 }}>+18</div>
+              <div style={{ fontSize: 11, color: "var(--text-tertiary)", marginTop: 3 }}>{L.shipped}</div>
+            </div>
+          </motion.div>
+        </motion.div>
       </div>
 
-      {/* mascot peek (front-most) */}
-      <img
-        src="/assets/mascot-yellow.png"
-        alt=""
-        style={{ position: "absolute", right: -28, top: -34, width: 74, transform: "rotate(8deg) translateZ(96px)", filter: "drop-shadow(0 10px 22px rgba(0,0,0,0.16))" }}
-      />
+      {/* mascot peek (front-most). Outer div holds the static 3D placement +
+         rotate/translateZ; inner motion.img arrives with EXAGGERATION — a
+         bouncy spring overshoot — then keeps a tiny idle wobble (secondary
+         life). Both guarded by reduce. */}
+      <div style={{ position: "absolute", right: -28, top: -34, transform: "rotate(8deg) translateZ(96px)" }}>
+        <motion.img
+          src="/assets/mascot-yellow.png"
+          alt=""
+          style={{ display: "block", width: 74, transformOrigin: "70% 100%", filter: "drop-shadow(0 10px 22px rgba(0,0,0,0.16))" }}
+          {...(reduce
+            ? {}
+            : {
+                initial: { opacity: 0, scale: 0.4, y: -14, rotate: -10 },
+                animate: { opacity: 1, scale: 1, y: 0, rotate: [-10, 6, -3, 0] },
+                transition: {
+                  opacity: { duration: DUR.fast, delay: 0.5 },
+                  scale: { ...SPRING.bouncy, delay: 0.5 },
+                  y: { ...SPRING.bouncy, delay: 0.5 },
+                  rotate: { duration: 0.9, ease: EASE.emphasized, delay: 0.5 },
+                },
+              })}
+        />
+      </div>
     </div>
   );
 }

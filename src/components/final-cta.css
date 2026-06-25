@@ -101,9 +101,16 @@
   text-align: center;
 }
 
+/* Wrapper carries the JS entrance overshoot so the <img> keeps its idle
+   float transform without the two fighting. */
+.fcta__mascot-wrap {
+  margin: 0 auto 22px;
+  width: 72px;
+  will-change: transform;
+}
+
 .fcta__mascot {
   width: 72px;
-  margin: 0 auto 22px;
   display: block;
   filter: drop-shadow(0 10px 28px rgba(var(--brand-glow), 0.35));
 }
@@ -157,4 +164,21 @@
 @media (max-width: 600px) {
   .fcta__glow-halo { height: 320px; }
   .fcta__glow-core { height: 230px; }
+}
+
+/* Belt-and-suspenders a11y guard. The breathe/float loops are gated in JS via
+   the .fcta--still modifier, but if that class is ever missed, stop every
+   infinite loop (and the hover glow drift) at the CSS layer too. */
+@media (prefers-reduced-motion: reduce) {
+  .fcta__glow-core,
+  .fcta__mascot,
+  .fcta__mascot-wrap {
+    animation: none !important;
+  }
+
+  .fcta__glow,
+  .fcta:hover .fcta__glow {
+    transition: none;
+    transform: translateY(0);
+  }
 }

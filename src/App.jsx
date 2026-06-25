@@ -3,6 +3,7 @@ import { useState, useEffect, lazy, Suspense } from "react";
 import { flushSync } from "react-dom";
 import { Header, Footer } from "./components/shell.jsx";
 import { SmoothScroll, ScrollProgress, PageTransition } from "./motion/primitives.jsx";
+import { AnimatePresence } from "motion/react";
 import { GsapEffects } from "./motion/GsapEffects.jsx";
 import { parseLocation, pathForTarget } from "./router.js";
 import { useSiteContent } from "./content/useSiteContent.js";
@@ -170,7 +171,9 @@ export default function App() {
       <Header t={t} lang={lang} setLang={setLang} theme={theme} toggleTheme={toggleTheme} route={route} navigate={navigate} />
       <main>
         <Suspense fallback={<div style={{ minHeight: "60vh" }} />}>
-          <PageTransition routeKey={route + (slug || "") + lang}>{Page}</PageTransition>
+          <AnimatePresence mode="wait">
+            <PageTransition key={route + (slug || "")} routeKey={route + (slug || "")}>{Page}</PageTransition>
+          </AnimatePresence>
         </Suspense>
       </main>
       <Footer t={t} navigate={navigate} />

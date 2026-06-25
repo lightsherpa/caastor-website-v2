@@ -138,6 +138,14 @@
   letter-spacing: -0.02em;
   line-height: 1;
   color: var(--brand-strong);
+  /* Secondary action: the metric reacts when the card itself is hovered.
+     Lifts/swells slightly as the Card primitive raises — characterful, subtle. */
+  transform-origin: 0% 100%;
+  transition: transform var(--dur-base, 0.3s) var(--ease-spring, cubic-bezier(0.22, 0.61, 0.36, 1));
+  will-change: transform;
+}
+.tw-card:hover .tw-card-metric-v {
+  transform: scale(1.07) translateY(-1px);
 }
 .tw-card-metric-l {
   font-size: 12px;
@@ -182,4 +190,16 @@
   letter-spacing: -0.02em;
   color: var(--text-on-brand);
   border: 1.5px solid var(--bg-canvas);
+}
+
+/* ── Reduced motion: kill the secondary metric reaction. The featured
+   card's JS animations are already guarded via useReducedMotion(). ── */
+@media (prefers-reduced-motion: reduce) {
+  .tw-card-metric-v {
+    transition: none;
+    will-change: auto;
+  }
+  .tw-card:hover .tw-card-metric-v {
+    transform: none;
+  }
 }

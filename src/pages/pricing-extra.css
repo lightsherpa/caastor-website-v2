@@ -67,8 +67,32 @@
 }
 
 .pr-save {
+  position: relative;
   display: inline-flex;
   align-items: center;
+}
+
+/* Sparkle flourish that arcs out of the save badge on the yearly flip.
+   Purely decorative (aria-hidden) and JS-driven by motion; the static
+   styling here just paints the little brand dots. */
+.pr-sparkles {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+.pr-spark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 6px;
+  height: 6px;
+  margin: -3px;
+  border-radius: 50%;
+  background: var(--brand);
+  box-shadow: 0 0 8px rgba(var(--brand-glow), 0.7);
 }
 
 /* aria-live note: announced by AT, hidden visually (the price already
@@ -88,6 +112,11 @@
 @media (prefers-reduced-motion: reduce) {
   .pr-seg-thumb {
     transition: none;
+  }
+  /* Belt-and-suspenders: motion already gates the sparkle flourish behind
+     useReducedMotion(); hide it outright if it ever renders. */
+  .pr-sparkles {
+    display: none;
   }
 }
 
