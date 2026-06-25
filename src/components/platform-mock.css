@@ -8,6 +8,16 @@
    hero's smaller render size.
    ────────────────────────────────────────────────────────────────── */
 
+/* Warning foreground for badges/feed icons on the amber tint. Hardcoded
+   dark amber gives AA on the pale light-theme tint; in dark theme the tint
+   sits on a dark card, so switch to a light amber to avoid dark-on-dark. */
+.pm {
+  --pm-warn-fg: #8a5e00;
+}
+[data-theme="dark"] .pm {
+  --pm-warn-fg: var(--status-warning);
+}
+
 /* Stat strip — active requests / in review / delivered */
 .pmx-stats {
   display: grid;

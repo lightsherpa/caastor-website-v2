@@ -131,6 +131,14 @@
   -webkit-text-fill-color: transparent;
   color: transparent;
 }
+/* In dark theme the band inverts to a white base (--bg-inverse: #fff), and the
+   amber brand-gradient headline turns into near-invisible light-on-light. Drop
+   the clip and use the inverse text color so the headline stays legible. */
+[data-theme="dark"] .fcta__title .fcta__accent {
+  background: none;
+  -webkit-text-fill-color: var(--text-inverse);
+  color: var(--text-inverse);
+}
 
 .fcta__body {
   font-size: 19px;

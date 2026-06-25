@@ -35,7 +35,7 @@ const TONE = {
 };
 
 const STATUS = {
-  review: { fg: "#8a5e00", bg: "var(--status-warning-soft)" }, // darker for AA on tint
+  review: { fg: "var(--pm-warn-fg)", bg: "var(--status-warning-soft)" }, // AA on tint in light + dark
   progress: { fg: "var(--accent-strong)", bg: "var(--accent-soft)" },
   done: { fg: "var(--status-success)", bg: "var(--status-success-soft)" },
   queued: { fg: "var(--text-tertiary)", bg: "var(--bg-muted)" },
@@ -76,7 +76,7 @@ function feed(es) {
     },
     {
       ic: "sparkles",
-      fg: "#8a5e00",
+      fg: "var(--pm-warn-fg)",
       bg: "var(--status-warning-soft)",
       lead: es ? (<><b>Nueva petición</b> asignada</>) : (<><b>New request</b> assigned</>),
       time: es ? "hace 1 h" : "1 h ago",

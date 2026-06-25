@@ -154,6 +154,7 @@
 
 /* cost vs in-house comparison */
 .wb-cost {
+  position: relative;
   display: flex;
   align-items: flex-end;
   justify-content: center;
