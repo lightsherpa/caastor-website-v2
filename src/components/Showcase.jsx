@@ -5,9 +5,9 @@ import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useReducedMotion, useInView } from "motion/react";
 import { Icon, Button } from "../ds/components.jsx";
 import { Reveal } from "./shell.jsx";
-import { EASE, DUR, SPRING } from "../motion/tokens.js";
 import "./showcase-redesign.css";
 
+const EASE = [0.22, 0.61, 0.36, 1];
 const CYCLE_MS = 4400;
 const ICONS = ["star", "grid", "message", "layers"]; // brand, web, social, graphic
 
@@ -194,41 +194,9 @@ export function Showcase({ t, navigate }) {
               aria-pressed={on}
               onClick={() => jump(i)}
             >
-              <motion.span
-                className="scx-chip"
-                aria-hidden="true"
-                // Secondary action: when a tab activates, the index chip
-                // reacts with a tiny anticipation dip then springy overshoot.
-                animate={
-                  reduce
-                    ? {}
-                    : on
-                      ? { scale: [0.86, 1.12, 1], rotate: [0, -7, 0] }
-                      : { scale: 1, rotate: 0 }
-                }
-                transition={
-                  reduce
-                    ? { duration: 0 }
-                    : on
-                      ? { duration: 0.5, ease: EASE.emphasized, times: [0, 0.55, 1] }
-                      : SPRING.soft
-                }
-              >
-                <motion.span
-                  // The icon ticks/wiggles a beat behind the chip (overlapping action).
-                  style={{ display: "grid", placeItems: "center" }}
-                  animate={reduce ? {} : on ? { rotate: [0, 9, 0] } : { rotate: 0 }}
-                  transition={
-                    reduce
-                      ? { duration: 0 }
-                      : on
-                        ? { duration: 0.45, ease: EASE.out, delay: 0.06 }
-                        : { duration: DUR.fast }
-                  }
-                >
-                  <Icon name={ICONS[i]} size={17} />
-                </motion.span>
-              </motion.span>
+              <span className="scx-chip" aria-hidden="true">
+                <Icon name={ICONS[i]} size={17} />
+              </span>
 
               <span className="scx-body">
                 <span className="scx-title">
@@ -243,29 +211,17 @@ export function Showcase({ t, navigate }) {
                       initial={reduce ? false : { height: 0, opacity: 0 }}
                       animate={{ height: "auto", opacity: 1 }}
                       exit={reduce ? { opacity: 0 } : { height: 0, opacity: 0 }}
-                      transition={{ duration: reduce ? 0 : 0.34, ease: EASE.out }}
+                      transition={{ duration: reduce ? 0 : 0.34, ease: EASE }}
                     >
                       <span className="scx-desc-body">{it.body}</span>
                       <span className="scx-bullets">
                         {(bullets[i] || []).map((d, di) => (
-                          <motion.span
-                            key={di}
-                            className="scx-bullet"
-                            // Follow-through: bullets cascade in after the panel
-                            // opens (icon -> title -> body rhythm), settling softly.
-                            initial={reduce ? false : { opacity: 0, x: -8 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={
-                              reduce
-                                ? { duration: 0 }
-                                : { ...SPRING.soft, delay: 0.12 + di * 0.07 }
-                            }
-                          >
+                          <span key={di} className="scx-bullet">
                             <span className="scx-bullet-tick" aria-hidden="true">
                               <Icon name="check" size={12} color="var(--brand-strong)" />
                             </span>
                             <span>{d}</span>
-                          </motion.span>
+                          </span>
                         ))}
                       </span>
                     </motion.span>
@@ -319,7 +275,7 @@ export function Showcase({ t, navigate }) {
                 initial={reduce ? false : { opacity: 0, y: 4 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={reduce ? { opacity: 0 } : { opacity: 0, y: -4 }}
-                transition={{ duration: reduce ? 0 : 0.24, ease: EASE.out }}
+                transition={{ duration: reduce ? 0 : 0.24, ease: EASE }}
               >
                 {stageLabels[active] || items[active]?.title}
               </motion.span>
@@ -335,20 +291,10 @@ export function Showcase({ t, navigate }) {
             <motion.div
               key={active}
               className="scx-layer"
-              // Follow-through: the incoming mock arrives with a soft settle
-              // (scale overshoots past 1 then eases back) rather than stopping dead.
-              initial={{ opacity: 0, scale: 0.96, y: reduce ? 0 : 10 }}
-              animate={{
-                opacity: 1,
-                scale: reduce ? 1 : [0.96, 1.012, 1],
-                y: 0,
-              }}
+              initial={{ opacity: 0, scale: 0.97, y: reduce ? 0 : 8 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 1 }}
-              transition={{
-                duration: reduce ? 0 : 0.46,
-                ease: EASE.emphasized,
-                scale: reduce ? { duration: 0 } : { duration: 0.5, ease: EASE.emphasized, times: [0, 0.7, 1] },
-              }}
+              transition={{ duration: reduce ? 0 : 0.42, ease: EASE }}
             >
               <Mock />
             </motion.div>

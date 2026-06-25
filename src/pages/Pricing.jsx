@@ -5,12 +5,10 @@ import { Button, Badge, Icon } from "../ds/components.jsx";
 import { Reveal, Eyebrow, SectionHead } from "../components/shell.jsx";
 import { FinalCTA } from "../components/FinalCTA.jsx";
 import { FAQList } from "../components/Faq.jsx";
-import { EASE, DUR, SPRING } from "../motion/tokens.js";
 import "./pricing-extra.css";
 
 function BillingToggle({ p, yearly, setYearly, liveNote }) {
   const b = p.billing;
-  const reduce = useReducedMotion();
   // Roving-tabindex radiogroup: the two options behave as radios so AT
   // announces "radio button, 1 of 2 / 2 of 2" and the price-change note.
   const onKeyDown = (e) => {
@@ -64,56 +62,10 @@ function BillingToggle({ p, yearly, setYearly, liveNote }) {
         {opt(false, b.monthlyLabel)}
         {opt(true, b.yearlyLabel)}
       </div>
-      {/* Secondary reaction: when the period flips, the save badge re-keys
-          and pops with a tiny wind-up (anticipation) then settles with a
-          bouncy spring (follow-through). A pair of sparkles arc outward as
-          a characterful flourish. All motion is reduced-motion guarded. */}
       <span className="pr-save">
-        <AnimatePresence mode="popLayout" initial={false}>
-          <motion.span
-            key={yearly ? "y" : "m"}
-            style={{ display: "inline-flex", transformOrigin: "center" }}
-            initial={reduce ? false : { scale: 0.82, opacity: 0 }}
-            animate={
-              reduce
-                ? {}
-                : { scale: [0.82, 0.94, 1.08, 1], opacity: 1 }
-            }
-            exit={reduce ? {} : { scale: 0.9, opacity: 0 }}
-            transition={
-              reduce
-                ? { duration: 0 }
-                : { duration: DUR.base, ease: EASE.emphasized, times: [0, 0.25, 0.7, 1] }
-            }
-          >
-            <Badge tone="success" dot>
-              {b.saveLabel}
-            </Badge>
-          </motion.span>
-        </AnimatePresence>
-        {!reduce && (
-          <AnimatePresence>
-            {yearly && (
-              <span className="pr-sparkles" aria-hidden>
-                {[-1, 1].map((dir) => (
-                  <motion.span
-                    key={dir}
-                    className="pr-spark"
-                    initial={{ opacity: 0, x: 0, y: 0, scale: 0.4 }}
-                    animate={{
-                      opacity: [0, 1, 0],
-                      x: dir * 14,
-                      y: [0, -10, -16],
-                      scale: [0.4, 1, 0.6],
-                    }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.5, ease: EASE.out, delay: dir > 0 ? 0.05 : 0 }}
-                  />
-                ))}
-              </span>
-            )}
-          </AnimatePresence>
-        )}
+        <Badge tone="success" dot>
+          {b.saveLabel}
+        </Badge>
       </span>
       <span className="pr-live" role="status" aria-live="polite">
         {liveNote}
@@ -129,38 +81,11 @@ function PlanCard({ plan, p, navigate, yearly, lang }) {
   const per = yearly ? p.yearlyPer : p.per;
   const inclLabel = lang === "es" ? "Incluido" : "What's included";
 
-  // Hover secondary reaction: the card publishes a "hover"/"rest" state that
-  // children subscribe to — the ribbon sparkle wiggles and the feature
-  // checkmarks pop in a gentle stagger (follow-through). CSS still owns the
-  // card lift/shadow; motion only animates the child flourishes.
-  const ribbonVar = {
-    rest: { rotate: 0, scale: 1 },
-    hover: { rotate: [0, -12, 10, 0], scale: [1, 1.18, 1.18, 1] },
-  };
-  const ckVar = {
-    rest: { scale: 1 },
-    hover: (i) => ({
-      scale: [1, 1.22, 1],
-      transition: { duration: 0.34, ease: EASE.emphasized, delay: i * 0.035 },
-    }),
-  };
-
   return (
-    <motion.article
-      className={"prc-card" + (isPop ? " is-popular" : "")}
-      initial="rest"
-      animate="rest"
-      whileHover={reduce ? undefined : "hover"}
-    >
+    <article className={"prc-card" + (isPop ? " is-popular" : "")}>
       {isPop && (
         <span className="prc-ribbon">
-          <motion.span
-            style={{ display: "inline-flex", transformOrigin: "center" }}
-            variants={reduce ? undefined : ribbonVar}
-            transition={{ duration: 0.5, ease: EASE.out }}
-          >
-            <Icon name="sparkles" size={13} />
-          </motion.span>
+          <Icon name="sparkles" size={13} />
           {p.popular}
         </span>
       )}
@@ -176,19 +101,7 @@ function PlanCard({ plan, p, navigate, yearly, lang }) {
         </div>
 
         <div className="prc-price-row">
-          {/* Price-change secondary reaction: the whole amount re-keys on a
-              billing flip and ticks with a brief brand glow pulse, while the
-              digits keep their original spring-driven vertical swap. */}
-          <motion.span
-            className="prc-amount"
-            key={"amt-" + amount}
-            animate={
-              reduce
-                ? undefined
-                : { textShadow: ["0 0 0 rgba(245,180,0,0)", "0 0 16px rgba(245,180,0,0.55)", "0 0 0 rgba(245,180,0,0)"] }
-            }
-            transition={reduce ? undefined : { duration: DUR.slow, ease: EASE.out }}
-          >
+          <span className="prc-amount">
             {p.currency === "$" ? "$" : ""}
             <AnimatePresence mode="popLayout" initial={false}>
               <motion.span
@@ -196,14 +109,14 @@ function PlanCard({ plan, p, navigate, yearly, lang }) {
                 initial={reduce ? false : { y: 10, opacity: 0 }}
                 animate={reduce ? {} : { y: 0, opacity: 1 }}
                 exit={reduce ? {} : { y: -10, opacity: 0 }}
-                transition={reduce ? { duration: 0 } : SPRING.snappy}
+                transition={{ type: "spring", stiffness: 420, damping: 30 }}
                 style={{ display: "inline-block" }}
               >
                 {amount}
               </motion.span>
             </AnimatePresence>
             {p.currency === "€" ? " €" : ""}
-          </motion.span>
+          </span>
           <span className="prc-per">{per}</span>
         </div>
         {p.vat && <div className="prc-vat">{p.vat}</div>}
@@ -228,19 +141,15 @@ function PlanCard({ plan, p, navigate, yearly, lang }) {
         <ul className="prc-feats">
           {plan.features.map((f, i) => (
             <li key={i} className="prc-feat">
-              <motion.span
-                className="prc-feat-ck"
-                custom={i}
-                variants={reduce ? undefined : ckVar}
-              >
+              <span className="prc-feat-ck">
                 <Icon name="check" size={13} stroke={2.2} />
-              </motion.span>
+              </span>
               {f}
             </li>
           ))}
         </ul>
       </div>
-    </motion.article>
+    </article>
   );
 }
 

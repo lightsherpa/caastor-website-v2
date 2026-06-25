@@ -16,7 +16,8 @@ import {
   useInView,
 } from "motion/react";
 import Lenis from "lenis";
-import { EASE } from "./tokens.js";
+
+const EASE = [0.22, 0.61, 0.36, 1]; // macOS-standard ease-out
 
 /* ── SmoothScroll — Lenis inertial scrolling. GSAP + ScrollTrigger are
    loaded asynchronously (kept OUT of the critical bundle) and take over
@@ -74,62 +75,19 @@ export function ScrollProgress() {
 }
 
 /* ── Reveal — opacity + rise + de-blur, spring-settled on view ── */
-export function Reveal({ children, delay = 0, style, as = "div", y = 22, className, stagger = 0 }) {
+export function Reveal({ children, delay = 0, style, as = "div", y = 22, className }) {
   const reduce = useReducedMotion();
   const Comp = motion[as] || motion.div;
   if (reduce) return <Comp className={className} style={style}>{children}</Comp>;
-
-  // Overlapping-children mode (follow-through): when `stagger` is set, the
-  // wrapper orchestrates and direct children trail in + settle with a gentle
-  // overshoot. Each child must be a <RevealItem> (or carry the matching
-  // variants) to participate. Default (stagger === 0) keeps the original
-  // single-element reveal untouched.
-  if (stagger) {
-    const container = {
-      hidden: {},
-      show: { transition: { staggerChildren: stagger, delayChildren: delay / 1000 } },
-    };
-    return (
-      <Comp
-        className={className}
-        variants={container}
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true, margin: "0px 0px -10% 0px" }}
-        style={style}
-      >
-        {children}
-      </Comp>
-    );
-  }
-
   return (
     <Comp
       className={className}
       initial={{ opacity: 0, y, filter: "blur(8px)" }}
       whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
       viewport={{ once: true, margin: "0px 0px -10% 0px" }}
-      transition={{ duration: 0.7, delay: delay / 1000, ease: EASE.out }}
+      transition={{ duration: 0.7, delay: delay / 1000, ease: EASE }}
       style={style}
     >
-      {children}
-    </Comp>
-  );
-}
-
-/* ── RevealItem — a single trailing child for <Reveal stagger>. Rises in
-   and settles with EASE.emphasized (overshoot tail) for follow-through.
-   Reduced-motion: renders inert. ── */
-export function RevealItem({ children, style, as = "div", y = 16, className }) {
-  const reduce = useReducedMotion();
-  const Comp = motion[as] || motion.div;
-  if (reduce) return <Comp className={className} style={style}>{children}</Comp>;
-  const item = {
-    hidden: { opacity: 0, y, filter: "blur(8px)" },
-    show: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.6, ease: EASE.emphasized } },
-  };
-  return (
-    <Comp className={className} variants={item} style={style}>
       {children}
     </Comp>
   );
@@ -144,8 +102,7 @@ export function PageTransition({ routeKey, children }) {
       key={routeKey}
       initial={{ opacity: 0, y: 12, filter: "blur(6px)" }}
       animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-      exit={{ opacity: 0, y: -10, filter: "blur(6px)" }}
-      transition={{ duration: 0.5, ease: EASE.out }}
+      transition={{ duration: 0.5, ease: EASE }}
     >
       {children}
     </motion.div>
@@ -176,7 +133,7 @@ export function SlotWord({ words, interval = 2100, className }) {
           initial={{ y: "105%" }}
           animate={{ y: "0%" }}
           exit={{ y: "-105%" }}
-          transition={{ duration: 0.55, ease: EASE.emphasized }}
+          transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
         >
           {words[i]}
         </motion.span>
@@ -222,7 +179,7 @@ export function ScrollTilt({ children, rest = 7, className, style }) {
       <motion.div
         initial={{ opacity: 0, y: 54, rotateX: rest + 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.9, ease: EASE.out, delay: 0.15 }}
+        transition={{ duration: 0.9, ease: EASE, delay: 0.15 }}
         onMouseMove={onMove}
         onMouseLeave={onLeave}
         style={{ rotateX, rotateY, y, transformStyle: "preserve-3d", willChange: "transform" }}
@@ -351,7 +308,7 @@ export function HeroHeadline({ a, serif, b, className = "t-display-lg balance", 
   const container = { hidden: {}, show: { transition: { staggerChildren: 0.05, delayChildren: 0.12 } } };
   const word = {
     hidden: { opacity: 0, y: "0.5em", filter: "blur(8px)" },
-    show: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.6, ease: EASE.emphasized } },
+    show: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.6, ease: EASE } },
   };
   return (
     <motion.h1 className={className} style={style} variants={container} initial="hidden" animate="show">

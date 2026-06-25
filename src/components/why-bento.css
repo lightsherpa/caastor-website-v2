@@ -379,27 +379,3 @@
   from { transform: scaleX(0); }
   to   { transform: scaleX(1); }
 }
-
-/* ── Reduced motion ──────────────────────────────────────────────────
-   Stop every keyframe animation in this file — including the looping
-   `infinite` ones (wbDash on the live merge wires, wbPulse on the merge
-   node) that previously had no guard — and neutralize entrance transforms
-   so visuals render in their final, settled state. */
-@media (prefers-reduced-motion: reduce) {
-  .wb-cell,
-  .wb-glow { transition: none; }
-
-  .wb-swatches span,
-  .wb-swatches span > span,
-  .wb-cost-bar,
-  .wb-merge-chip,
-  .wb-merge-wire,
-  .wb-merge-wire.is-live,
-  .wb-merge-mark,
-  .wb-turn-fill {
-    animation: none !important;
-    transform: none !important;
-    opacity: 1 !important;
-    stroke-dashoffset: 0 !important;
-  }
-}

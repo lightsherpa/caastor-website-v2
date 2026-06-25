@@ -5,7 +5,6 @@
    ────────────────────────────────────────────────────────────────── */
 import { useState, useRef } from "react";
 import { motion, useMotionValue, useSpring, useReducedMotion } from "motion/react";
-import { SPRING, GESTURE } from "../motion/tokens.js";
 
 /* ── ICONS — inline SVG paths/fragments ─────────────────────── */
 export const ICONS = {
@@ -188,22 +187,8 @@ export function Button({ variant = "primary", size = "md", icon, iconEnd, childr
       onMouseOver={(e) => {
         e.currentTarget.style.background = v.hover;
       }}
-      initial="rest"
-      animate="rest"
-      whileHover={reduce ? undefined : "hover"}
-      whileTap={reduce ? undefined : "press"}
-      variants={
-        reduce
-          ? undefined
-          : {
-              rest: { scale: 1, scaleX: 1, scaleY: 1 },
-              // Anticipation: a tiny wind-up dip before the pop settles.
-              hover: { scale: [0.985, GESTURE.hoverPop.scale], transition: SPRING.snappy },
-              // Squash on press; spring release lets it stretch back past 1.
-              press: { ...GESTURE.tapSquash, transition: SPRING.snappy },
-            }
-      }
-      transition={SPRING.snappy}
+      whileTap={reduce ? undefined : { scale: 0.97 }}
+      transition={{ type: "spring", stiffness: 400, damping: 22 }}
       style={{
         x: magnetic ? x : 0,
         y: magnetic ? y : 0,
@@ -231,22 +216,7 @@ export function Button({ variant = "primary", size = "md", icon, iconEnd, childr
     >
       {icon && <Icon name={icon} size={s.ic} />}
       {children}
-      {iconEnd &&
-        (reduce ? (
-          <Icon name={iconEnd} size={s.ic} />
-        ) : (
-          // Secondary action: end icon nudges forward + lifts when the button hovers.
-          <motion.span
-            style={{ display: "inline-flex" }}
-            variants={{
-              rest: { x: 0, y: 0 },
-              hover: { x: 2, y: -1, transition: SPRING.bouncy },
-              press: { x: 0, y: 0 },
-            }}
-          >
-            <Icon name={iconEnd} size={s.ic} />
-          </motion.span>
-        ))}
+      {iconEnd && <Icon name={iconEnd} size={s.ic} />}
     </motion.button>
   );
 }

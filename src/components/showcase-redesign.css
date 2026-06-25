@@ -116,22 +116,6 @@
   background: var(--brand);
   color: var(--text-on-brand);
   box-shadow: 0 4px 12px rgba(var(--brand-glow), 0.35);
-  /* Secondary action: a one-shot glow pulse rings out as the chip activates. */
-  animation: scxChipGlow 0.6s var(--ease-out, ease-out);
-}
-@keyframes scxChipGlow {
-  0% {
-    box-shadow: 0 0 0 0 rgba(var(--brand-glow), 0.45),
-      0 4px 12px rgba(var(--brand-glow), 0.35);
-  }
-  70% {
-    box-shadow: 0 0 0 7px rgba(var(--brand-glow), 0),
-      0 4px 12px rgba(var(--brand-glow), 0.35);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(var(--brand-glow), 0),
-      0 4px 12px rgba(var(--brand-glow), 0.35);
-  }
 }
 
 .scx-body {
@@ -353,16 +337,4 @@
   width: 22px;
   background: var(--brand);
   opacity: 1;
-}
-
-/* ── Reduced motion: hold everything still ───────────────────── */
-@media (prefers-reduced-motion: reduce) {
-  .scx-tab.on .scx-chip {
-    animation: none;
-  }
-  .scx-ring-fill {
-    /* No sweeping progress arc — show a filled ring instead of animating. */
-    animation: none;
-    stroke-dashoffset: 0;
-  }
 }

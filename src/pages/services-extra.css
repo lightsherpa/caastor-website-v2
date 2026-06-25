@@ -280,17 +280,12 @@
 }
 
 /* Honour reduced-motion at the CSS layer too — the JS already swaps to
-   static frames, this just hard-stops any residual transition/animation.
-   The media-panel lift / figure secondary-action are driven in JS and
-   already reduced-motion guarded; this neutralises any residual transform
-   so nothing settles off-origin for these users. */
+   static frames, this just hard-stops any residual transition/animation. */
 @media (prefers-reduced-motion: reduce) {
   .svc-svg *,
-  .svc-media,
   .svc-media-sheen,
   .svc-card:hover .svc-media-sheen {
     animation: none !important;
     transition: none !important;
-    transform: none !important;
   }
 }
