@@ -8,7 +8,7 @@
 .ftr {
   position: relative;
   overflow: hidden;
-  background: var(--bg-inverse);
+  background: #0B0B0F;
   color: #fff;
   padding: 96px 0 0;
   isolation: isolate;
@@ -167,7 +167,7 @@
 /* Clear, on-brand keyboard focus ring (replaces the removed UA outline). */
 .ftr-link:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px var(--bg-inverse), 0 0 0 4px var(--brand);
+  box-shadow: 0 0 0 2px #0B0B0F, 0 0 0 4px var(--brand);
 }
 .ftr-link:hover::before,
 .ftr-link:focus-visible::before {

@@ -53,7 +53,7 @@
 
 /* ── Feature card: elevated, dark, magnetic ── */
 .bx-card.is-feature {
-  background: linear-gradient(180deg, var(--bg-inverse), #16130b);
+  background: linear-gradient(180deg, #0B0B0F, #16130b);
   border-color: rgba(var(--brand-glow), 0.5);
   box-shadow: 0 24px 60px -20px rgba(0, 0, 0, 0.55),
     0 0 0 1px rgba(var(--brand-glow), 0.18);
